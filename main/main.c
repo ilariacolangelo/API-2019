@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
+#include <stdbool.h>
 
 #define ADDENT "addent"
 #define DELENT "delent"
@@ -9,41 +11,95 @@
 #define REPORT "report"
 #define END "end"
 
-void addent();
-void delent();
-void addrel();
-void delrel();
-void report();
-void end();
+#define SIZEHASH 100000
 
-int main() {
-    char action[10];
-    //caso in cui ho file con solo END?
-    do{
+typedef struct ent{                                 // entity in hashmap
+    char name[1024];
+    struct ent *next;
+}hash_entity;
 
-        scanf("%s", action);
-        if(strcmp(action,ADDENT)==0){
-            addent();
-        }else if(strcmp(action,DELENT)==0){
-            delent();
-        }else if(strcmp(action,ADDREL)==0){
-            addrel();
-        }else if(strcmp(action,DELREL)==0){
-            delrel();
-        }else if(strcmp(action,REPORT)==0){
-            report();
-        }else if(strcmp(action,END)==0){
-            end();
+
+int hashfunc(char username[]){                      //polynomial rolling hash function
+    int len= strlen(username);
+    long int hashval=0;
+    for(int i = 0;i<len;i++){
+        hashval+=(int)username[i]*(long int)exp2(i);
+    }
+    return (int)hashval%SIZEHASH;
+}
+
+void read(char string[]){                           // scanf without " "
+    char virgolette;
+    int len;
+    scanf("%c",&virgolette);
+    scanf("%c",&virgolette);
+    scanf("%s",string);
+    len = strlen(string);
+    string[len-1]='\0';
+}
+
+hash_entity setInput(char username[]){              //create entity
+    hash_entity ret;
+    strcpy(ret.name,username);
+    ret.next= NULL;
+    return ret;
+}
+
+void addItem(hash_entity *item, hash_entity elem){     //link pointer with memory allocated to entity
+    strcpy(item->name,elem.name);
+    item->next = NULL;
+}
+
+bool isIn(char username[],hash_entity **hash){          // username is tracked yet?
+    int pos;
+    hash_entity *curr;
+    pos = hashfunc(username);
+    curr = hash[pos];
+    if (curr==NULL){
+        return false;
+    } else if(curr->next == NULL && strcmp(curr->name, username)!=0){
+        return false;
+    } else{
+        while(curr->next!= NULL){
+            curr = curr->next;
+            if (strcmp(curr->name, username)==0){
+                return true;
+            }
         }
+        return false;
+    }
 
-    } while(strcmp(action,END)!=0);
-
-    printf("end of file\n");
 }
 
 
-void addent(){
-   printf("addent\n");
+void addent(hash_entity *hash[]){
+    char username[1024];
+    read(username);                          //scanf without " "
+
+
+    if (!isIn(username,hash)) {
+        hash_entity current;
+        hash_entity *item;
+        int pos;
+
+        current = setInput(username);
+        item = malloc(sizeof(hash_entity));  //allocate memory for entity-struct
+        addItem(item, current);
+
+        pos = hashfunc(item->name);         // pos entity in hashmap
+
+
+        if (hash[pos] != NULL) {            //if pos is occupied for collision put in next
+            hash_entity *curr;
+            curr = hash[pos];
+            while (curr->next != NULL) {
+                curr = curr->next;
+            }
+            curr->next = item;
+        } else hash[pos] = item;            //if pos is free
+        printf("Username:%s\nPos:%d\naddent ok\n",hash[pos]->name, pos);
+    }else printf("Username already tracked!\n");
+
 }
 
 void delent(){
@@ -65,3 +121,32 @@ void report(){
 void end(){
     printf("end\n");
 }
+
+int main() {
+    char action[10];
+    hash_entity *hash[SIZEHASH] = {NULL};
+
+    //caso in cui ho file con solo END?
+    do{
+
+        scanf("%s", action);
+        if(strcmp(action,ADDENT)==0){
+            addent(hash);
+        }else if(strcmp(action,DELENT)==0){
+            delent();
+        }else if(strcmp(action,ADDREL)==0){
+            addrel();
+        }else if(strcmp(action,DELREL)==0){
+            delrel();
+        }else if(strcmp(action,REPORT)==0){
+            report();
+        }else if(strcmp(action,END)==0){
+            end();
+        }
+
+    } while(strcmp(action,END)!=0);
+
+    printf("end of file\n");
+}
+
+
