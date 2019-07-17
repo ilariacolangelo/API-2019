@@ -50,37 +50,39 @@ void addItem(hash_entity *item, hash_entity elem){     //link pointer with memor
     item->next = NULL;
 }
 
-bool isIn(char username[],hash_entity **hash){          // username is tracked yet?
+int isIn(char username[],hash_entity **hash){          // username is tracked yet?
     int pos;
-    hash_entity *curr;
+    hash_entity *flagpoint;
     pos = hashfunc(username);
-    curr = hash[pos];
-    if (curr==NULL){
-        return false;
-    } else if(curr->next == NULL && strcmp(curr->name, username)!=0){
-        return false;
-    } else{
-        while(curr->next!= NULL){
-            curr = curr->next;
-            if (strcmp(curr->name, username)==0){
-                return true;
-            }
-        }
-        return false;
-    }
 
+    if(hash[pos]==NULL){
+        return 0;
+    }else{
+        flagpoint = hash[pos];
+        while(flagpoint->next!=NULL && strcmp(username,flagpoint->name)!= 0){
+            flagpoint = flagpoint->next;
+        }
+        if(strcmp(username,flagpoint->name)== 0)
+            return 1;
+        else{
+            return 0;
+        }
+    }
 }
+
+
 
 
 void addent(hash_entity *hash[]){
     char username[1024];
+    hash_entity current;
+    hash_entity *item;
+    hash_entity *flagpoint;
+    int pos;
+
     read(username);                          //scanf without " "
 
-
-    if (!isIn(username,hash)) {
-        hash_entity current;
-        hash_entity *item;
-        int pos;
+    if (isIn(username,hash)==0) {
 
         current = setInput(username);
         item = malloc(sizeof(hash_entity));  //allocate memory for entity-struct
@@ -99,6 +101,8 @@ void addent(hash_entity *hash[]){
         } else hash[pos] = item;            //if pos is free
         printf("Username:%s\nPos:%d\naddent ok\n",hash[pos]->name, pos);
     }else printf("Username already tracked!\n");
+
+
 
 }
 
