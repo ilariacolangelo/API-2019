@@ -13,11 +13,25 @@
 
 #define SIZEHASH 100000
 
+typedef struct username { char x[1024]; } username;
+
 typedef struct ent{                                 // entity in hashmap
     char name[1024];
     struct ent *next;
 }hash_entity;
 
+typedef struct rel{                             // teste tipi relazioni
+    char id_rel[1024];
+    int len_array;
+    user *first_user;
+    struct rel *next;
+}head_rel;
+
+typedef struct user{                                //user della singola relazione
+    char name[1024];
+    int n_rel;
+    username name_list[1];
+}user;
 
 int hashfunc(char username[]){                      //polynomial rolling hash function
     int len= strlen(username);
@@ -38,7 +52,7 @@ void read(char string[]){                           // scanf without " "
     string[len-1]='\0';
 }
 
-hash_entity setInput(char username[]){              //create entity
+hash_entity setInput(char username[]){              //create hash   entity
     hash_entity ret;
     strcpy(ret.name,username);
     ret.next= NULL;
@@ -50,7 +64,7 @@ void addItem(hash_entity *item, hash_entity elem){     //link pointer with memor
     item->next = NULL;
 }
 
-int isIn(char username[],hash_entity **hash){          // username is tracked yet?
+int isInHash(char *username, hash_entity **hash){          // username is tracked yet?
     int pos;
     hash_entity *flagpoint;
     pos = hashfunc(username);
@@ -70,6 +84,29 @@ int isIn(char username[],hash_entity **hash){          // username is tracked ye
     }
 }
 
+int isInRel(char *namerel, head_rel *curr) {                     //curr start pointing to the head of rel_list
+    int cmp;
+    if (curr!=NULL) {
+        cmp = strcmp(curr->id_rel,namerel);
+        while (cmp < 0 && curr->next != NULL){
+            curr = curr->next;
+            cmp = strcmp(curr->id_rel,namerel);
+        }
+        if (cmp == 0)return 1;
+    }
+    return 0;
+}
+
+
+
+int isBefore(char username1[],char username2[]) {   //lexicographic check
+    if (strcmp(username1,username2)<=0)
+        return 1;
+    else
+        return 0;
+}
+
+
 
 
 
@@ -82,7 +119,7 @@ void addent(hash_entity *hash[]){
 
     read(username);                          //scanf without " "
 
-    if (isIn(username,hash)==0) {
+    if (isInHash(username,hash)==0) {
 
         current = setInput(username);
         item = malloc(sizeof(hash_entity));  //allocate memory for entity-struct
@@ -129,8 +166,10 @@ void end(){
 int main() {
     char action[10];
     hash_entity *hash[SIZEHASH] = {NULL};
+    head_rel *head;
 
-    //caso in cui ho file con solo END?
+
+
     do{
 
         scanf("%s", action);
