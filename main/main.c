@@ -20,6 +20,12 @@ typedef struct ent{                                 // entity in hashmap
     struct ent *next;
 }hash_entity;
 
+typedef struct user{                                //user della singola relazione
+    char name[1024];
+    int n_rel;
+    username name_list[1];
+}user;
+
 typedef struct rel{                             // teste tipi relazioni
     char id_rel[1024];
     int len_array;
@@ -27,11 +33,7 @@ typedef struct rel{                             // teste tipi relazioni
     struct rel *next;
 }head_rel;
 
-typedef struct user{                                //user della singola relazione
-    char name[1024];
-    int n_rel;
-    username name_list[1];
-}user;
+
 
 int hashfunc(char username[]){                      //polynomial rolling hash function
     int len= strlen(username);
@@ -84,17 +86,29 @@ int isInHash(char *username, hash_entity **hash){          // username is tracke
     }
 }
 
-int isInRel(char *namerel, head_rel *curr) {                     //curr start pointing to the head of rel_list
-    int cmp;
+int isInRel(char *namerel, head_rel *head, head_rel *prec) {                     //curr start pointing to the head of rel_list
+    int cmp;                                                                    // It returns -1 if list is empty, 1 if name rel exist,0 if doesn't.
+    head_rel *curr;                                                             // *prec at the end points where new_rel has to be linked
+    curr=head;
+    prec=curr;
+
     if (curr!=NULL) {
         cmp = strcmp(curr->id_rel,namerel);
-        while (cmp < 0 && curr->next != NULL){
+        while (cmp < 0 && curr->next != NULL) {
+            prec=curr;
             curr = curr->next;
             cmp = strcmp(curr->id_rel,namerel);
         }
+        if(curr->next == NULL) {
+            cmp = strcmp(curr->id_rel,namerel);
+        }
+
+        if(cmp<=0) prec = curr;
+
         if (cmp == 0)return 1;
-    }
-    return 0;
+        else return 0;
+
+    }else return -1;
 }
 
 
@@ -136,7 +150,7 @@ void addent(hash_entity *hash[]){
             }
             curr->next = item;
         } else hash[pos] = item;            //if pos is free
-        printf("Username:%s\nPos:%d\naddent ok\n",hash[pos]->name, pos);
+        printf("Username:%s addent ok\n",hash[pos]->name);
     }else printf("Username already tracked!\n");
 
 
@@ -147,8 +161,30 @@ void delent(){
     printf("delent\n");
 }
 
-void addrel(){
-    printf("addrel\n");
+void addrel(hash_entity *hash[], head_rel *head){
+    char orig[1024];
+    char dest[1024];
+    char rel[1024];
+    read(orig);
+    read(dest);
+    read(rel);
+
+    int flagRel;
+    head_rel *pointer=NULL;
+
+    if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1){
+        flagRel=isInRel(rel,head,pointer);
+        if (flagRel==1){
+            //modifica struttura
+            printf("modifica\n");
+        }else if(flagRel<0){
+            //aggiungi rel in testa
+            printf("rel in testa\n");
+        }else{
+            //aggiungi rel dove punta pointer;
+            printf("rel aggiunta in mezzo\n");
+        }
+    }else printf("entità non monitorate\n");
 }
 
 void delrel(){
@@ -178,7 +214,7 @@ int main() {
         }else if(strcmp(action,DELENT)==0){
             delent();
         }else if(strcmp(action,ADDREL)==0){
-            addrel();
+            addrel(hash,head);
         }else if(strcmp(action,DELREL)==0){
             delrel();
         }else if(strcmp(action,REPORT)==0){

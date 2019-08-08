@@ -2,4 +2,8 @@ addent "sara"
 addent "giova"
 addent "serena"
 addent "serena"
+addrel "sara" "simona" "love"
+addent "simona"
+addrel "sara" "simona" "love"
+addrel "giova" "serena" "life"
 end
