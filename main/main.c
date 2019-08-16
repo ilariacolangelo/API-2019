@@ -179,33 +179,66 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
 
     int flagRel = 0;
     int posHash;
-    head_rel *item;
+
+    head_rel *item=NULL;
     head_rel *pointer=NULL;
     head_rel *create=NULL;
     head_rel *temp=NULL;
 
-    if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1){
+    if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1) {
         printf("NUOVA RELAZIONE: %s\n",rel);
         flagRel=isInRel(rel,hashRel);
         printf("flagRel %d\n",flagRel);
-        if (flagRel==1){
-            //modifica struttura
+        if (flagRel==1) { //modifica struttura
+            posHash = hashfunc(rel,SIZETYPEREL);
+            pointer = hashRel[posHash];
+            while(strcmp(pointer->id_rel,rel)!=0) {
+                pointer = pointer->next;
+            }
+            //pointer punta all'elemento typerel giusto
+            //adesso certo l'user dest
+            int i=0;
+            int cmpDest = strcmp(pointer->rel_users[i].name,dest);
+            while(i<pointer->len_array && cmpDest!=0) {
+                i++;
+                cmpDest = strcmp(pointer->rel_users[i].name,dest);
+            }
+            if(cmpDest == 0) {//dest è già presente
+                int j = 0;
+                int cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
+
+                while(j<pointer->rel_users[i].n_rel && cmpOrig!=0) {
+                    j++;
+                    cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
+                }
+                if(cmpOrig==0) {
+                    printf("relazione già esistente! \n");
+                }else {
+                    strcpy(pointer->rel_users[i].name_list[j+1].x,orig);
+                    pointer->rel_users[i].n_rel++;
+                    printf("nuova relazione aggiunta alla struttura\n");
+                }
+
+            }else {//aggiungo dest all'array degli user e orig in pos 0 nella lista user di dest appena creato
+                strcpy(pointer->rel_users[i+1].name,dest);
+                pointer->rel_users[i+1].n_rel = 1;
+                strcpy(pointer->rel_users[i+1].name_list[0].x,orig);
+            }
             printf("modifica struttura\n");
-            exit(0);
         }else { //aggiungi nuova rel
             item  = malloc(sizeof(head_rel));
             setRel(rel,orig,dest,item);
-            create = malloc(sizeof(head_rel));
-            addRelType(create,item);
+            //create = malloc(sizeof(head_rel));
+            //addRelType(create,item);
             posHash = hashfunc(rel,SIZETYPEREL);
             if(hashRel[posHash]== NULL){
-                hashRel[posHash] = create;
+                hashRel[posHash] = item;
             }else{ //collision
                 head_rel *point = hashRel[posHash];
                 while(point->next!=NULL){
                     point = point->next;
                 }
-                point->next = create;
+                point->next = item;
             }
 
             create = NULL;
