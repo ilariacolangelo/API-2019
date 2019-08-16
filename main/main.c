@@ -165,10 +165,6 @@ void addent(hash_entity *hash[]){
 
 }
 
-void delent(){
-    printf("delent\n");
-}
-
 void addrel(hash_entity *hash[], head_rel *hashRel[]){
     char orig[1024];
     char dest[1024];
@@ -196,7 +192,7 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
                 pointer = pointer->next;
             }
             //pointer punta all'elemento typerel giusto
-            //adesso certo l'user dest
+            //adesso cerco l'user dest
             int i=0;
             int cmpDest = strcmp(pointer->rel_users[i].name,dest);
             while(i<pointer->len_array && cmpDest!=0) {
@@ -250,8 +246,52 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
 
 }
 
-void delrel(){
-    printf("delrel\n");
+void delent(){
+    printf("delent\n");
+}
+
+void delrel(hash_entity *hash[], head_rel *hashRel[]){
+    char orig[1024];
+    char dest[1024];
+    char rel[1024];
+    read(orig);
+    read(dest);
+    read(rel);
+
+    int posHash;
+
+    head_rel *pointer=NULL;
+
+    if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1 && isInRel(rel,hashRel)==1) {
+        //modifica struttura
+        posHash = hashfunc(rel,SIZETYPEREL);
+        pointer = hashRel[posHash];
+        while(strcmp(pointer->id_rel,rel)!=0) {
+            pointer = pointer->next;
+        }
+        //pointer punta all'elemento typerel giusto
+        //adesso cerco l'user dest
+        int i=0;
+        int cmpDest = strcmp(pointer->rel_users[i].name,dest);
+        while(i<pointer->len_array && cmpDest!=0) {
+            i++;
+            cmpDest = strcmp(pointer->rel_users[i].name,dest);
+        }
+        if(cmpDest == 0) {//dest è presente
+            int j = 0;
+            int cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
+
+            while(j<pointer->rel_users[i].n_rel && cmpOrig!=0) {
+                j++;
+                cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
+            }
+            if(cmpOrig==0) {//orig è presente
+                //modificare struttura eliminando la relazione
+            }
+        }
+    }else {
+        printf("relazione non esistente\n");
+    }
 }
 
 void report(){
@@ -276,7 +316,7 @@ int main() {
         }else if(strcmp(action,ADDREL)==0){
             addrel(hash,hashRel);
         }else if(strcmp(action,DELREL)==0){
-            delrel();
+            delrel(hash,hashRel);
         }else if(strcmp(action,REPORT)==0){
             report();
         }else if(strcmp(action,END)==0){
