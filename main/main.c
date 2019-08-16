@@ -212,19 +212,20 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
                     cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
                 }
                 if(cmpOrig==0) {
-                    printf("relazione già esistente! \n");
+                    printf("Relazione già esistente! \n");
                 }else {
                     strcpy(pointer->rel_users[i].name_list[j+1].x,orig);
                     pointer->rel_users[i].n_rel++;
-                    printf("nuova relazione aggiunta alla struttura\n");
+                    printf("nuovo user aggiunto alla listuser di dest\n");
                 }
 
             }else {//aggiungo dest all'array degli user e orig in pos 0 nella lista user di dest appena creato
                 strcpy(pointer->rel_users[i+1].name,dest);
                 pointer->rel_users[i+1].n_rel = 1;
                 strcpy(pointer->rel_users[i+1].name_list[0].x,orig);
+                printf("nuovo user aggiunto al typeRel\n");
             }
-            printf("modifica struttura\n");
+            printf("modificata struttura\n");
         }else { //aggiungi nuova rel
             item  = malloc(sizeof(head_rel));
             setRel(rel,orig,dest,item);
@@ -242,7 +243,7 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
             }
 
             create = NULL;
-            printf("aggiunta!\n");
+            printf("aggiunto nuovo typeRel\n");
         }
 
     }else printf("entità non monitorate\n");
