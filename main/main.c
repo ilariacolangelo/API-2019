@@ -12,6 +12,9 @@
 #define END "end"
 
 #define SIZEHASH 100000
+#define SIZETYPEREL 1000
+#define SIZEUSER 300
+#define SIZELISTUSER 200
 
 typedef struct username { char x[1024]; } username;
 
@@ -23,26 +26,27 @@ typedef struct ent{                                 // entity in hashmap
 typedef struct user{                                //user della singola relazione
     char name[1024];
     int n_rel;
-    username name_list[1];
+    username name_list[SIZELISTUSER];
 }user;
 
 typedef struct rel{                             // teste tipi relazioni
     char id_rel[1024];
     int len_array;
-    user rel_users[1];
+    user rel_users[SIZEUSER];
     struct rel *next;
 }head_rel;
 
 hash_entity *hash[SIZEHASH] = {NULL};
+head_rel *hashRel[SIZETYPEREL] = {NULL};
 head_rel *head;
 
-int hashfunc(char username[]){                      //polynomial rolling hash function
+int hashfunc(char username[], int size){                      //polynomial rolling hash function
     int len= strlen(username);
     long int hashval=0;
     for(int i = 0;i<len;i++){
         hashval+=(int)username[i]*(long int)exp2(i);
     }
-    return (int)hashval%SIZEHASH;
+    return (int)hashval%size;
 }
 
 void read(char string[]){                           // scanf without " "
@@ -89,7 +93,7 @@ void addRelType(head_rel *p, head_rel elem){
 int isInHash(char *username, hash_entity **hash){          // username is tracked yet?
     int pos;
     hash_entity *flagpoint;
-    pos = hashfunc(username);
+    pos = hashfunc(username,SIZEHASH);
 
     if(hash[pos]==NULL){
         return 0;
@@ -106,42 +110,25 @@ int isInHash(char *username, hash_entity **hash){          // username is tracke
     }
 }
 
-int isInRel(char *namerel, head_rel **prec) {                     //curr start pointing to the head of rel_list
-    int cmp;                                                     // It returns -1 if list is empty, 1 if name rel exist,0 if doesn't.
-    head_rel *curr;
-    curr=head;
-    *prec = NULL;
+int isInRel(char *namerel, head_rel **hash) {                     //curr start pointing to the head of rel_list
+    int pos;
+    head_rel *flagpoint;
+    pos = hashfunc(namerel,SIZETYPEREL);
 
-    if (curr!=NULL) {
-        printf("step 1\n");
-        cmp = strcmp(curr->id_rel,namerel);
-        while (curr->next!=NULL && cmp < 0) {
-            printf("step 2\n");
-            *prec=curr;
-            curr = curr->next;
-            cmp = strcmp(curr->id_rel,namerel);
+    if(hash[pos]==NULL){
+        return 0;
+    }else{
+        flagpoint = hash[pos];
+        while(flagpoint->next!=NULL && strcmp(namerel,flagpoint->id_rel)!= 0){
+            flagpoint = flagpoint->next;
         }
-
-        if(curr->next == NULL && cmp<0) {
-            cmp = strcmp(curr->id_rel, namerel);
-            printf("step 3\n");
-        }
-
-        if(cmp == 0) {
-            return 2;
-        }else if(cmp < 0) {
-            *prec = curr;
-            return 0;
-        }else{
+        if(strcmp(namerel,flagpoint->id_rel)== 0)
             return 1;
+        else{
+            return 0;
         }
-
-    } else return -1;
+    }
 }
-
-
-
-
 
 int isBefore(char username1[],char username2[]) {   //lexicographic check
     if (strcmp(username1,username2)<=0)
@@ -149,7 +136,6 @@ int isBefore(char username1[],char username2[]) {   //lexicographic check
     else
         return 0;
 }
-
 
 void addent(hash_entity *hash[]){
     char username[1024];
@@ -166,7 +152,7 @@ void addent(hash_entity *hash[]){
         item = malloc(sizeof(hash_entity));  //allocate memory for entity-struct
         addItem(item, current);
 
-        pos = hashfunc(item->name);         // pos entity in hashmap
+        pos = hashfunc(item->name,SIZEHASH);         // pos entity in hashmap
 
 
         if (hash[pos] != NULL) {            //if pos is occupied for collision put in next
@@ -180,15 +166,13 @@ void addent(hash_entity *hash[]){
         printf("Username:%s addent ok\n",hash[pos]->name);
     }else printf("Username already tracked!\n");
 
-
-
 }
 
 void delent(){
     printf("delent\n");
 }
 
-void addrel(hash_entity *hash[], head_rel **head){
+void addrel(hash_entity *hash[], head_rel *hashRel[]){
     char orig[1024];
     char dest[1024];
     char rel[1024];
@@ -197,6 +181,7 @@ void addrel(hash_entity *hash[], head_rel **head){
     read(rel);
 
     int flagRel;
+    int posHash;
 
     head_rel *pointer=NULL;
     head_rel *create=NULL;
@@ -204,52 +189,31 @@ void addrel(hash_entity *hash[], head_rel **head){
 
     if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1){
         printf("NUOVA RELAZIONE: %s\n",rel);
-        flagRel=isInRel(rel,&pointer);
+        flagRel=isInRel(rel,hashRel);
         printf("flagRel %d\n",flagRel);
-        if (flagRel==2){
+        if (flagRel==1){
             //modifica struttura
-            printf("modifica\n");
-        }else if(flagRel==-1){
-            printf("rel in testa\n");
-
+            printf("modifica struttura\n");
+        }else { //aggiungi nuova rel
             head_rel item;
             item = setRel(rel,orig,dest);
             create = malloc(sizeof(head_rel));
             addRelType(create,item);
-            *head = create;
-            create = NULL;
 
-        }else{
-            head_rel item;
-            item = setRel(rel,orig,dest);
-            create = malloc(sizeof(head_rel));
-            addRelType(create,item);
-            head_rel *p=*head;
-            printf("head rel: %s\n",p->id_rel);
-            if (pointer == NULL){       //List with only one element or lexicographicaly first
-                if (flagRel==1){        //add to the top
-                    create->next=*head;
-                    *head=create;
-                }else{                  //add to the end
-                    temp = *head;
-                    temp->next=create;
+            posHash = hashfunc(rel,SIZETYPEREL);
+            if(hashRel[posHash]== NULL){
+                hashRel[posHash] = create;
+            }else{ //collision
+                head_rel *point = hashRel[posHash];
+                while(point->next!=NULL){
+                    point = point->next;
                 }
-                create = NULL;
-                temp = NULL;
-            }else if(pointer->next!=NULL){
-                printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
-            create->next=pointer->next;
-            pointer->next=create;
-            }else {
-                pointer->next=create;
+                point->next = create;
             }
-            create=NULL;
-            temp = NULL;
-            p=*head;
-            printf("NEW head rel: %s\n",p->id_rel);
-            pointer=*head;
-            printf("rel aggiunta in mezzo\n");
+            create = NULL;
+            printf("aggiunta!\n");
         }
+
     }else printf("entità non monitorate\n");
 
 }
@@ -278,7 +242,7 @@ int main() {
         }else if(strcmp(action,DELENT)==0){
             delent();
         }else if(strcmp(action,ADDREL)==0){
-            addrel(hash,&head);
+            addrel(hash,hashRel);
         }else if(strcmp(action,DELREL)==0){
             delrel();
         }else if(strcmp(action,REPORT)==0){
@@ -290,15 +254,6 @@ int main() {
     } while(strcmp(action,END)!=0);
 
     printf("end of file\n");
-
-    head_rel *test;
-    test = head;
-    while (test->next!=NULL){
-        printf("%s ->",test->id_rel);
-        test=test->next;
-    }
-    printf("%s ->",test->id_rel);
-    printf("\n");
 }
 
 
