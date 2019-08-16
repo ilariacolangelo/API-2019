@@ -67,15 +67,13 @@ hash_entity setInput(char username[]){              //create hash   entity
 }
 
 
-head_rel setRel(char rel[], char orig[], char dest[]){                                  //create rel entity
-    head_rel item;
-    strcpy(item.id_rel,rel);
-    item.len_array=1;
-    strcpy(item.rel_users[0].name, dest);
-    item.rel_users[0].n_rel=1;
-    strcpy(item.rel_users[0].name_list[0].x,orig);
-    item.next=NULL;
-    return item;
+void setRel(char rel[], char orig[], char dest[],head_rel*item){                                  //create rel entity
+    strcpy(item->id_rel,rel);
+    item->len_array=1;
+    strcpy(item->rel_users[0].name, dest);
+    item->rel_users[0].n_rel=1;
+    strcpy(item->rel_users[0].name_list[0].x,orig);
+    item->next=NULL;
 }
 
 void addItem(hash_entity *item, hash_entity elem){     //link pointer with memory allocated to entity
@@ -83,18 +81,17 @@ void addItem(hash_entity *item, hash_entity elem){     //link pointer with memor
     item->next = NULL;
 }
 
-void addRelType(head_rel *p, head_rel elem){
-    strcpy(p->id_rel,elem.id_rel);
-    p->len_array=elem.len_array;
-    p->rel_users[0]=elem.rel_users[0];
-    p->next=elem.next;
+void addRelType(head_rel *p, head_rel* elem){
+    strcpy(p->id_rel,elem->id_rel);
+    p->len_array=elem->len_array;
+    p->rel_users[0]=elem->rel_users[0];
+    p->next=elem->next;
 }
 
 int isInHash(char *username, hash_entity **hash){          // username is tracked yet?
     int pos;
     hash_entity *flagpoint;
     pos = hashfunc(username,SIZEHASH);
-
     if(hash[pos]==NULL){
         return 0;
     }else{
@@ -180,9 +177,9 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
     read(dest);
     read(rel);
 
-    int flagRel;
+    int flagRel = 0;
     int posHash;
-
+    head_rel *item;
     head_rel *pointer=NULL;
     head_rel *create=NULL;
     head_rel *temp=NULL;
@@ -194,12 +191,12 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
         if (flagRel==1){
             //modifica struttura
             printf("modifica struttura\n");
+            exit(0);
         }else { //aggiungi nuova rel
-            head_rel item;
-            item = setRel(rel,orig,dest);
+            item  = malloc(sizeof(head_rel));
+            setRel(rel,orig,dest,item);
             create = malloc(sizeof(head_rel));
             addRelType(create,item);
-
             posHash = hashfunc(rel,SIZETYPEREL);
             if(hashRel[posHash]== NULL){
                 hashRel[posHash] = create;
@@ -210,6 +207,7 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
                 }
                 point->next = create;
             }
+
             create = NULL;
             printf("aggiunta!\n");
         }
@@ -255,5 +253,3 @@ int main() {
 
     printf("end of file\n");
 }
-
-
