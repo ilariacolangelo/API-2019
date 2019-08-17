@@ -10,6 +10,7 @@ addrel "giova" "simona" "love"
 delrel "giova" "simona" "love"
 addrel "giova" "serena" "life"
 delrel "giova" "serena" "life"
+delent "simona"
 delrel "sara" "giova" "love"
 addrel "giova" "serena" "friend"
 end

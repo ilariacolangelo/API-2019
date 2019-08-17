@@ -88,6 +88,72 @@ void addRelType(head_rel *p, head_rel* elem){
     p->next=elem->next;
 }
 
+void findUserInRel(char *username, head_rel *temp, head_rel *prec, head_rel **hashRel) {
+    int i=0;
+    int z=0;
+    int w;
+
+    int cmpList;
+    int cmp;
+
+    while(i<temp->len_array) {//scansiona tutto l'array di user
+
+        cmp = strcmp(temp->rel_users[i].name,username);
+        if(cmp == 0) {//username è presente-> elimina elemento da user array
+            z = i;
+            temp->len_array--;
+            while(z<(temp->len_array)){
+                temp->rel_users[z] = temp->rel_users[z+1];
+                z++;
+            }
+            strcpy(temp->rel_users[temp->len_array].name,"\0");
+            temp->rel_users[temp->len_array].n_rel=0;
+            i--;
+        }else { //scava nella userlist dell'username in questione per trovare username da eliminare
+            z=0;
+            cmpList = strcmp(temp->rel_users[i].name_list[z].x,username);
+            while(z<temp->rel_users[i].n_rel && cmpList!=0) {
+                z++;
+                cmpList = strcmp(temp->rel_users[i].name_list[z].x,username);
+            }
+
+            if(cmpList==0) { //trovato username in list da eliminare
+                temp->rel_users[i].n_rel--;
+                while(z<(temp->rel_users[i].n_rel)){
+                    strcpy(temp->rel_users[i].name_list[z].x,temp->rel_users[i].name_list[z+1].x);
+                    z++;
+                }
+                strcpy(temp->rel_users[i].name_list[temp->rel_users[i].n_rel].x,"\0");
+
+                if(temp->rel_users[i].n_rel==0) {//User senza più relazioni
+                    temp->len_array--;
+                    w = i;
+                    while(w<(temp->len_array)){
+                        temp->rel_users[w] = temp->rel_users[w+1];
+                        w++;
+                    }
+                    strcpy(temp->rel_users[temp->len_array].name,"\0");
+                    temp->rel_users[temp->len_array].n_rel=0;
+                }
+            }
+        }
+
+        if (temp->len_array==0){//non esistono più relazioni di quel tipo
+            if(prec!=NULL) {
+                if (temp->next == NULL) { //ultimo elem di lista di collisioni
+                    prec->next = NULL;
+                } else {//elemento in mezzo alla lista di collisioni
+                    prec->next = temp->next;
+                }
+            }
+            free(temp);
+            if (prec != NULL) temp=prec;
+        }
+
+        i++;
+    }
+}
+
 int isInHash(char *username, hash_entity **hash){          // username is tracked yet?
     int pos;
     hash_entity *flagpoint;
@@ -165,7 +231,7 @@ void addent(hash_entity *hash[]){
 
 }
 
-void addrel(hash_entity *hash[], head_rel *hashRel[]){
+void addrel(hash_entity *hash[], head_rel *hashRel[]) {
     char orig[1024];
     char dest[1024];
     char rel[1024];
@@ -246,8 +312,50 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]){
 
 }
 
-void delent(){
-    printf("delent\n");
+void delent(hash_entity *hash[], head_rel *hashRel[]) {
+    char username[1024];
+    int pos;
+
+    hash_entity *flagpoint;
+    hash_entity *prec = NULL;
+    head_rel *temp = NULL;
+    head_rel *tempPrec = NULL;
+
+    read(username);
+
+    if (isInHash(username,hash)==1) {
+        pos = hashfunc(username,SIZEHASH);
+        flagpoint = hash[pos];
+        while(flagpoint->next!=NULL && strcmp(username,flagpoint->name)!= 0){
+            prec = flagpoint;
+            flagpoint = flagpoint->next;
+        }
+        //flagpoint punta all'elemento da eliminare
+        if(prec!=NULL) {
+            if (flagpoint->next == NULL) { //ultimo elem di lista di collisioni
+                prec->next = NULL;
+            } else {//elemento in mezzo alla lista di collisioni
+                prec->next = flagpoint->next;
+            }
+        }
+        free(flagpoint);
+
+        //scansiono tutta la hashRel
+        for(int i=0; i<SIZETYPEREL;i++) {
+            if (hashRel[i]!=NULL) { //esiste typeRel in pos i
+                temp = hashRel[i];
+                findUserInRel(username,temp,tempPrec,hashRel); //Qui tempPrec è NULL
+                while (temp->next!=NULL) {
+                    tempPrec = temp;
+                    temp = temp->next;
+                    findUserInRel(username,temp,tempPrec,hashRel);
+                }
+            }
+        }
+
+
+    }else printf("Username does not exist!\n");
+    printf("delent done\n");
 }
 
 void delrel(hash_entity *hash[], head_rel *hashRel[]){
@@ -299,10 +407,11 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
                 if(pointer->rel_users[i].n_rel==0) {//dest senza più relazioni
                     pointer->len_array--;
                     while(i<(pointer->len_array)){
-                        strcpy(pointer->rel_users[i].name, pointer->rel_users[i+1].name);
+                        pointer->rel_users[i] = pointer->rel_users[i+1];
                         i++;
                     }
                     strcpy(pointer->rel_users[pointer->len_array].name,"\0");
+                    pointer->rel_users[pointer->len_array].n_rel=0;
                 }
 
                 if (pointer->len_array==0){//non esistono più relazioni di quel tipo
@@ -346,7 +455,7 @@ int main() {
         if(strcmp(action,ADDENT)==0){
             addent(hash);
         }else if(strcmp(action,DELENT)==0){
-            delent();
+            delent(hash, hashRel);
         }else if(strcmp(action,ADDREL)==0){
             addrel(hash,hashRel);
         }else if(strcmp(action,DELREL)==0){
