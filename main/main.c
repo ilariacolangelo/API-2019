@@ -261,15 +261,17 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
     int posHash;
 
     head_rel *pointer=NULL;
+    head_rel *prec=NULL;
 
     if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1 && isInRel(rel,hashRel)==1) {
         //modifica struttura
         posHash = hashfunc(rel,SIZETYPEREL);
         pointer = hashRel[posHash];
         while(strcmp(pointer->id_rel,rel)!=0) {
+            prec = pointer;
             pointer = pointer->next;
         }
-        //pointer punta all'elemento typerel giusto
+        //pointer punta all'elemento typerel giusto e prec punta all'elemento che viene prima nella collisione altrimenti è NULL
         //adesso cerco l'user dest
         int i=0;
         int cmpDest = strcmp(pointer->rel_users[i].name,dest);
@@ -286,12 +288,44 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
                 cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
             }
             if(cmpOrig==0) {//orig è presente
-                //modificare struttura eliminando la relazione
+                //modificare struttura eliminando l'orig da userlist di dest relazione
+                pointer->rel_users[i].n_rel--;
+                while(j<(pointer->rel_users[i].n_rel)){
+                    strcpy(pointer->rel_users[i].name_list[j].x,pointer->rel_users[i].name_list[j+1].x);
+                    j++;
+                }
+                strcpy(pointer->rel_users[i].name_list[pointer->rel_users[i].n_rel].x,"\0");
+
+                if(pointer->rel_users[i].n_rel==0) {//dest senza più relazioni
+                    pointer->len_array--;
+                    while(i<(pointer->len_array)){
+                        strcpy(pointer->rel_users[i].name, pointer->rel_users[i+1].name);
+                        i++;
+                    }
+                    strcpy(pointer->rel_users[pointer->len_array].name,"\0");
+                }
+
+                if (pointer->len_array==0){//non esistono più relazioni di quel tipo
+                    if(prec!=NULL) {
+                        if (pointer->next == NULL) { //ultimo elem di lista di collisioni
+                            prec->next = NULL;
+                        } else {//elemento in mezzo alla lista di collisioni
+                            prec->next = pointer->next;
+                        }
+                    }
+                    free(pointer);
+
+                }
+            }else {
+                printf("orig: relazione non esistente\n");
             }
+        }else {
+            printf("dest: relazione non esistente\n");
         }
     }else {
         printf("relazione non esistente\n");
     }
+    printf("delrel done\n");
 }
 
 void report(){
