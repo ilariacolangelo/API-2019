@@ -59,14 +59,6 @@ void read(char string[]){                           // scanf without " "
     string[len-1]='\0';
 }
 
-hash_entity setInput(char username[]){              //create hash   entity
-    hash_entity ret;
-    strcpy(ret.name,username);
-    ret.next= NULL;
-    return ret;
-}
-
-
 void setRel(char rel[], char orig[], char dest[],head_rel*item){                                  //create rel entity
     strcpy(item->id_rel,rel);
     item->len_array=1;
@@ -74,11 +66,6 @@ void setRel(char rel[], char orig[], char dest[],head_rel*item){                
     item->rel_users[0].n_rel=1;
     strcpy(item->rel_users[0].name_list[0].x,orig);
     item->next=NULL;
-}
-
-void addItem(hash_entity *item, hash_entity elem){     //link pointer with memory allocated to entity
-    strcpy(item->name,elem.name);
-    item->next = NULL;
 }
 
 void addRelType(head_rel *p, head_rel* elem){
@@ -203,32 +190,32 @@ int isBefore(char username1[],char username2[]) {   //lexicographic check
 void addent(hash_entity *hash[]){
     char username[1024];
     hash_entity current;
-    hash_entity *item;
-    hash_entity *flagpoint;
+    hash_entity *item = NULL;
+    hash_entity *flagpoint = NULL;
     int pos;
 
     read(username);                          //scanf without " "
 
-    if (isInHash(username,hash)==0) {
-
-        current = setInput(username);
-        item = malloc(sizeof(hash_entity));  //allocate memory for entity-struct
-        addItem(item, current);
-
-        pos = hashfunc(item->name,SIZEHASH);         // pos entity in hashmap
-
-
-        if (hash[pos] != NULL) {            //if pos is occupied for collision put in next
-            hash_entity *curr;
-            curr = hash[pos];
-            while (curr->next != NULL) {
-                curr = curr->next;
-            }
-            curr->next = item;
-        } else hash[pos] = item;            //if pos is free
-        printf("Username:%s addent ok\n",hash[pos]->name);
-    }else printf("Username already tracked!\n");
-
+    pos = hashfunc(username,SIZEHASH);
+    if(hash[pos]==NULL){
+        item = malloc(sizeof(hash_entity)); //allocate memory for entity-struct
+        strcpy(item->name,username);
+        item->next = NULL;
+        hash[pos] = item;
+        printf("Entity:%s addent ok\n",hash[pos]->name);
+    }else {
+        flagpoint = hash[pos];
+        while(flagpoint->next!=NULL && strcmp(username,flagpoint->name)!= 0){
+            flagpoint = flagpoint->next;
+        }
+        if(strcmp(username,flagpoint->name)!= 0) {
+            item = malloc(sizeof(hash_entity)); //allocate memory for entity-struct
+            strcpy(item->name, username);
+            item->next = NULL;
+            flagpoint->next = item;
+            printf("Entity:%s addent ok\n",flagpoint->next->name);
+        }else printf("Entity already tracked\n");
+    }
 }
 
 void addrel(hash_entity *hash[], head_rel *hashRel[]) {
