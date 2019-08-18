@@ -309,40 +309,41 @@ void delent(hash_entity *hash[], head_rel *hashRel[]) {
     head_rel *tempPrec = NULL;
 
     read(username);
+    pos = hashfunc(username,SIZEHASH);
 
-    if (isInHash(username,hash)==1) {
-        pos = hashfunc(username,SIZEHASH);
+    if(hash[pos]!=NULL){
         flagpoint = hash[pos];
         while(flagpoint->next!=NULL && strcmp(username,flagpoint->name)!= 0){
-            prec = flagpoint;
+            prec =flagpoint;
             flagpoint = flagpoint->next;
         }
-        //flagpoint punta all'elemento da eliminare
-        if(prec!=NULL) {
-            if (flagpoint->next == NULL) { //ultimo elem di lista di collisioni
-                prec->next = NULL;
-            } else {//elemento in mezzo alla lista di collisioni
-                prec->next = flagpoint->next;
-            }
-        }
-        free(flagpoint);
-
-        //scansiono tutta la hashRel
-        for(int i=0; i<SIZETYPEREL;i++) {
-            if (hashRel[i]!=NULL) { //esiste typeRel in pos i
-                temp = hashRel[i];
-                findUserInRel(username,temp,tempPrec,hashRel); //Qui tempPrec è NULL
-                while (temp->next!=NULL) {
-                    tempPrec = temp;
-                    temp = temp->next;
-                    findUserInRel(username,temp,tempPrec,hashRel);
+        if(strcmp(username,flagpoint->name)== 0) {
+            //flagpoint punta all'elemento da eliminare
+            if(prec!=NULL) {
+                if (flagpoint->next == NULL) { //ultimo elem di lista di collisioni
+                    prec->next = NULL;
+                } else {//elemento in mezzo alla lista di collisioni
+                    prec->next = flagpoint->next;
                 }
             }
-        }
+            free(flagpoint);
 
+            //scansiono tutta la hashRel
+            for(int i=0; i<SIZETYPEREL;i++) {
+                if (hashRel[i]!=NULL) { //esiste typeRel in pos i
+                    temp = hashRel[i];
+                    findUserInRel(username,temp,tempPrec,hashRel); //Qui tempPrec è NULL
+                    while (temp->next!=NULL) {
+                        tempPrec = temp;
+                        temp = temp->next;
+                        findUserInRel(username,temp,tempPrec,hashRel);
+                    }
+                }
+            }
+        }else printf("Username does not exist!\n");
 
     }else printf("Username does not exist!\n");
-    printf("delent done\n");
+    printf("delEnt done\n");
 }
 
 void delrel(hash_entity *hash[], head_rel *hashRel[]){
