@@ -65,22 +65,6 @@ void read(char string[]){                           // scanf without " "
     string[len-1]='\0';
 }
 
-void setRel(char rel[], char orig[], char dest[],head_rel*item){                                  //create rel entity
-    strcpy(item->id_rel,rel);
-    item->len_array=1;
-    strcpy(item->rel_users[0].name, dest);
-    item->rel_users[0].n_rel=1;
-    strcpy(item->rel_users[0].name_list[0].x,orig);
-    item->next=NULL;
-}
-
-void addRelType(head_rel *p, head_rel* elem){
-    strcpy(p->id_rel,elem->id_rel);
-    p->len_array=elem->len_array;
-    p->rel_users[0]=elem->rel_users[0];
-    p->next=elem->next;
-}
-
 void findUserInRel(char *username, head_rel *temp, head_rel *prec, head_rel **hashRel) {
     int i=0;
     int z=0;
@@ -283,9 +267,12 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
             printf("modificata struttura\n");
         }else { //aggiungi nuova rel
             item  = malloc(sizeof(head_rel));
-            setRel(rel,orig,dest,item);
-            //create = malloc(sizeof(head_rel));
-            //addRelType(create,item);
+            strcpy(item->id_rel,rel);
+            item->len_array=1;
+            strcpy(item->rel_users[0].name, dest);
+            item->rel_users[0].n_rel=1;
+            strcpy(item->rel_users[0].name_list[0].x,orig);
+            item->next=NULL;
             posHash = hashfunc(rel,SIZETYPEREL);
             if(hashRel[posHash]== NULL){
                 hashRel[posHash] = item;
@@ -570,7 +557,7 @@ int main() {
             }else delrel(hash,hashRel);
 
         }else if(action[0]=='r') {
-            report(hashRel);
+            //report(hashRel);
         }else if(action[0]=='e') {
             end();
         }
