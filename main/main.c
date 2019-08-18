@@ -42,7 +42,7 @@ head_rel *head;
 
 int hashfunc(char username[], int size){                      //polynomial rolling hash function
     int len= strlen(username);
-    long int hashval=0;
+    int hashval=0;
     for(int i = 0;i<len;i++){
         hashval+=(int)username[i]*(long int)exp2(i);
     }
@@ -452,21 +452,25 @@ int main() {
     do{
 
         scanf("%s", action);
-        if(strcmp(action,ADDENT)==0){
-            addent(hash);
-        }else if(strcmp(action,DELENT)==0){
-            delent(hash, hashRel);
-        }else if(strcmp(action,ADDREL)==0){
-            addrel(hash,hashRel);
-        }else if(strcmp(action,DELREL)==0){
-            delrel(hash,hashRel);
-        }else if(strcmp(action,REPORT)==0){
+        if(action[0]=='a') {
+
+            if(action[3]=='e') {
+                addent(hash);
+            }else addrel(hash,hashRel);
+
+        }else if(action[0]=='d') {
+
+            if(action[3]=='e') {
+                delent(hash, hashRel);
+            }else delrel(hash,hashRel);
+
+        }else if(action[0]=='r') {
             report();
-        }else if(strcmp(action,END)==0){
+        }else if(action[0]=='e') {
             end();
         }
 
-    } while(strcmp(action,END)!=0);
+    } while(action[0]!='e');
 
     printf("end of file\n");
 }
