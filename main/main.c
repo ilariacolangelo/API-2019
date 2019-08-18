@@ -36,6 +36,12 @@ typedef struct rel{                             // teste tipi relazioni
     struct rel *next;
 }head_rel;
 
+typedef struct repTypeRel {
+    char id_rel[1024];
+    int max;
+    username maxuser[SIZEUSER];
+}repTypeRel;
+
 hash_entity *hash[SIZEHASH] = {NULL};
 head_rel *hashRel[SIZETYPEREL] = {NULL};
 head_rel *head;
@@ -425,7 +431,118 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
     printf("delrel done\n");
 }
 
-void report(){
+void report(head_rel *hashRel[]){
+    int i,j,z,w,y,h;
+    int sizeUserArray;
+    int sizeArray=0;
+    head_rel *temp = NULL;
+    head_rel *tempPrec = NULL;
+    repTypeRel reportArray[SIZETYPEREL];
+
+    for(i=0; i<SIZETYPEREL;i++) {
+        if (hashRel[i]!=NULL) { //esiste typeRel in pos i
+            temp = hashRel[i];
+            //blocco ripetuto nel while START
+            j=0;
+            if(sizeArray==0){
+                strcpy(reportArray[j].id_rel,temp->id_rel);
+                sizeArray++;
+            }else {
+                while(j<sizeArray && strcmp(reportArray[j].id_rel,temp->id_rel)<0) {//ordine alfabetico del typerel
+                    j++;
+                }
+                if(strcmp(reportArray[j].id_rel,temp->id_rel)>0) { // j=pos in array dove inserire la typeRel
+                    for(z=sizeArray; z>j; z--) {
+                        reportArray[z-1] = reportArray [z];
+                    }
+                    strcpy(reportArray[j].id_rel,temp->id_rel);
+                    sizeArray++;
+                }
+            }
+            for(w = 0; w<temp->len_array; w++){ //ricerca del max del typerel in pos j
+                reportArray[j].max = 0;
+                if(temp->rel_users[w].n_rel>reportArray[j].max) {
+                    reportArray[j].max = temp->rel_users[w].n_rel;
+                }
+            }
+
+            sizeUserArray = 0;
+            for(w = 0; w<temp->len_array; w++) { //ricerca di user con max ed inserimento in array
+                if (temp->rel_users[w].n_rel == reportArray[j].max) {
+                    if(sizeUserArray == 0){
+                        strcpy(reportArray[j].maxuser[0].x,temp->rel_users[w].name);
+                        sizeUserArray++;
+                    }else {
+                        y=0;
+                        while(y<sizeArray && strcmp(reportArray[j].maxuser[y].x, temp->rel_users[w].name)<0) {//ordine alfabetico del typerel
+                            y++;
+                        }
+                        if(strcmp(reportArray[j].maxuser[y].x, temp->rel_users[w].name)>0) {
+                            for(h=sizeUserArray; h>y; h--) {
+                                reportArray[j].maxuser[h-1]= reportArray[j].maxuser[h];
+                            }
+                            strcpy(reportArray[j].maxuser[y].x,temp->rel_users[w].name);
+                            sizeUserArray++;
+                        }
+                    }
+                }
+            }
+            //blocco ripetuto nel while FINISH
+
+            while (temp->next!=NULL) {
+                tempPrec = temp;
+                temp = temp->next;
+
+                //da 444 a 490 uguale
+                j=0;
+                if(sizeArray==0){
+                    strcpy(reportArray[j].id_rel,temp->id_rel);
+                    sizeArray++;
+                }else {
+                    while(j<sizeArray && strcmp(reportArray[j].id_rel,temp->id_rel)<0) {//ordine alfabetico del typerel
+                        j++;
+                    }
+                    if(strcmp(reportArray[j].id_rel,temp->id_rel)>0) { // j=pos in array dove inserire la typeRel
+                        for(z=sizeArray; z>j; z--) {
+                            reportArray[z-1] = reportArray [z];
+                        }
+                        strcpy(reportArray[j].id_rel,temp->id_rel);
+                        sizeArray++;
+                    }
+                }
+                for(w = 0; w<temp->len_array; w++){ //ricerca del max del typerel in pos j
+                    reportArray[j].max = 0;
+                    if(temp->rel_users[w].n_rel>reportArray[j].max) {
+                        reportArray[j].max = temp->rel_users[w].n_rel;
+                    }
+                }
+
+                sizeUserArray = 0;
+                for(w = 0; w<temp->len_array; w++) { //ricerca di user con max ed inserimento in array
+                    if (temp->rel_users[w].n_rel == reportArray[j].max) {
+                        if(sizeUserArray == 0){
+                            strcpy(reportArray[j].maxuser[0].x,temp->rel_users[w].name);
+                            sizeUserArray++;
+                        }else {
+                            y=0;
+                            while(y<sizeArray && strcmp(reportArray[j].maxuser[y].x, temp->rel_users[w].name)<0) {//ordine alfabetico del typerel
+                                y++;
+                            }
+                            if(strcmp(reportArray[j].maxuser[y].x, temp->rel_users[w].name)>0) {
+                                for(h=sizeUserArray; h>y; h--) {
+                                    reportArray[j].maxuser[h-1]= reportArray[j].maxuser[h];
+                                }
+                                strcpy(reportArray[j].maxuser[y].x,temp->rel_users[w].name);
+                                sizeUserArray++;
+                            }
+                        }
+                    }
+                }
+                //fine blocco uguale
+            }
+        }
+    }
+    //costruzione dell'output
     printf("report\n");
 }
 
@@ -453,7 +570,7 @@ int main() {
             }else delrel(hash,hashRel);
 
         }else if(action[0]=='r') {
-            report();
+            report(hashRel);
         }else if(action[0]=='e') {
             end();
         }
