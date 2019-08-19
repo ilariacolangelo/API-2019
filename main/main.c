@@ -11,8 +11,8 @@
 #define REPORT "report"
 #define END "end"
 
-#define SIZEHASH 100000
-#define SIZETYPEREL 1000
+#define SIZEHASH 100
+#define SIZETYPEREL 10
 #define SIZEUSER 300
 #define SIZELISTUSER 200
 
@@ -272,7 +272,7 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
             item->rel_users[0].n_rel=1;
             strcpy(item->rel_users[0].name_list[0].x,orig);
             item->next=NULL;
-            posHash = hashfunc(rel,SIZETYPEREL);
+
             if(hashRel[posHash]== NULL){
                 hashRel[posHash] = item;
             }else{ //collision
@@ -310,15 +310,16 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
                     if (cmpOrig == 0) {
                         printf("Relazione già esistente! \n");
                     } else {
-                        strcpy(pointer->rel_users[i].name_list[j + 1].x, orig);
+                        strcpy(pointer->rel_users[i].name_list[j+1].x, orig);
                         pointer->rel_users[i].n_rel++;
                         printf("nuovo user aggiunto alla listuser di dest\n");
                     }
 
                 } else {//aggiungo dest all'array degli user e orig in pos 0 nella lista user di dest appena creato
-                    strcpy(pointer->rel_users[i + 1].name, dest);
-                    pointer->rel_users[i + 1].n_rel = 1;
-                    strcpy(pointer->rel_users[i + 1].name_list[0].x, orig);
+                    strcpy(pointer->rel_users[i].name, dest);
+                    pointer->len_array++;
+                    pointer->rel_users[i].n_rel = 1;
+                    strcpy(pointer->rel_users[i].name_list[0].x, orig);
                     printf("nuovo user aggiunto al typeRel\n");
                 }
                 printf("modificata struttura\n");
@@ -339,7 +340,7 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
                 item->rel_users[0].n_rel=1;
                 strcpy(item->rel_users[0].name_list[0].x,orig);
                 item->next=NULL;
-                posHash = hashfunc(rel,SIZETYPEREL);
+
                 if(hashRel[posHash]== NULL){
                     hashRel[posHash] = item;
                 }else{ //collision
@@ -383,7 +384,7 @@ void delent(hash_entity *hash[], head_rel *hashRel[]) {
                 } else {//elemento in mezzo alla lista di collisioni
                     prec->next = flagpoint->next;
                 }
-            }
+            }else hash[pos] = NULL;
             strcpy(flagpoint->name, "\0");
             flagpoint->next = NULL;
 
@@ -622,6 +623,7 @@ void end(){
 }
 
 int main() {
+    int t;
     char action[10];
 
 
@@ -646,6 +648,21 @@ int main() {
             end();
         }
 
+        for(t=0; t<SIZEHASH; t++){
+            if (hash[t]== NULL) {
+                printf("-");
+            }else printf(" %s ",hash[t]->name);
+        }
+        printf("\n");
+        for(t=0; t<SIZETYPEREL; t++) {
+            if (hashRel[t]== NULL) {
+                printf("-");
+            }else {
+                printf(" %s lenarray %d ",hashRel[t]->id_rel, hashRel[t]->len_array);
+                printf("%s+%s+%s",hashRel[t]->rel_users[0].name,hashRel[t]->rel_users[1].name,hashRel[t]->rel_users[2].name);
+            }
+        }
+        printf("\n");
     } while(action[0]!='e');
 
     printf("end of file\n");
