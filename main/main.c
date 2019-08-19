@@ -43,8 +43,10 @@ typedef struct repTypeRel {
 }repTypeRel;
 
 hash_entity *hash[SIZEHASH] = {NULL};
+hash_entity *cacheEnt = NULL;
 head_rel *hashRel[SIZETYPEREL] = {NULL};
-head_rel *head;
+head_rel *cacheRel = NULL;
+
 
 int hashfunc(char username[], int size){                      //polynomial rolling hash function
     int len= strlen(username);
@@ -123,7 +125,18 @@ void findUserInRel(char *username, head_rel *temp, head_rel *prec, head_rel **ha
                     prec->next = temp->next;
                 }
             }
-            free(temp);
+            strcpy(temp->id_rel, "\0");
+            temp->len_array = 0;
+            temp->next = NULL;
+            //array di rel_users è già vuoto
+            head_rel *pointcache = cacheRel;
+            if(pointcache!=NULL){
+                while (pointcache->next!=NULL) {
+                    pointcache = pointcache->next;
+                }
+                pointcache->next = temp;
+            }else cacheRel = temp;
+
             if (prec != NULL) temp=prec;
         }
 
@@ -188,7 +201,14 @@ void addent(hash_entity *hash[]){
 
     pos = hashfunc(username,SIZEHASH);
     if(hash[pos]==NULL){
-        item = malloc(sizeof(hash_entity)); //allocate memory for entity-struct
+        if(cacheEnt == NULL) {
+            item = malloc(sizeof(hash_entity)); //allocate memory for entity-struct
+        }else {
+           item = cacheEnt;
+           if (item->next != NULL) {
+               cacheEnt = item->next;
+           }else cacheEnt = NULL;
+        }
         strcpy(item->name,username);
         item->next = NULL;
         hash[pos] = item;
@@ -199,7 +219,14 @@ void addent(hash_entity *hash[]){
             flagpoint = flagpoint->next;
         }
         if(strcmp(username,flagpoint->name)!= 0) {
-            item = malloc(sizeof(hash_entity)); //allocate memory for entity-struct
+            if(cacheEnt == NULL) {
+                item = malloc(sizeof(hash_entity)); //allocate memory for entity-struct
+            }else {
+                item = cacheEnt;
+                if (item->next != NULL) {
+                    cacheEnt = item->next;
+                }else cacheEnt = NULL;
+            }
             strcpy(item->name, username);
             item->next = NULL;
             flagpoint->next = item;
@@ -231,7 +258,14 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
         if(hashRel[posHash]==NULL){
             printf("NUOVA: %s\n",rel);
             //add new typerel
-            item  = malloc(sizeof(head_rel));
+            if(cacheRel == NULL) {
+                item  = malloc(sizeof(head_rel));
+            }else {
+                item = cacheRel;
+                if (item->next != NULL) {
+                    cacheRel = item->next;
+                }else cacheRel = NULL;
+            }
             strcpy(item->id_rel,rel);
             item->len_array=1;
             strcpy(item->rel_users[0].name, dest);
@@ -291,7 +325,14 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
             }else{
                 printf("NUOVA: %s\n",rel);
                 //add new typerel
-                item  = malloc(sizeof(head_rel));
+                if(cacheRel == NULL) {
+                    item  = malloc(sizeof(head_rel));
+                }else {
+                    item = cacheRel;
+                    if (item->next != NULL) {
+                        cacheRel = item->next;
+                    }else cacheRel = NULL;
+                }
                 strcpy(item->id_rel,rel);
                 item->len_array=1;
                 strcpy(item->rel_users[0].name, dest);
@@ -343,7 +384,16 @@ void delent(hash_entity *hash[], head_rel *hashRel[]) {
                     prec->next = flagpoint->next;
                 }
             }
-            free(flagpoint);
+            strcpy(flagpoint->name, "\0");
+            flagpoint->next = NULL;
+
+            hash_entity *pointEntCache = cacheEnt;
+            if(pointEntCache!=NULL){
+                while (pointEntCache->next!=NULL) {
+                    pointEntCache = pointEntCache->next;
+                }
+                pointEntCache->next = flagpoint;
+            }else cacheEnt = flagpoint;
 
             //scansiono tutta la hashRel
             for(int i=0; i<SIZETYPEREL;i++) {
@@ -427,7 +477,17 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
                             prec->next = pointer->next;
                         }
                     }
-                    free(pointer);
+                    strcpy(pointer->id_rel, "\0");
+                    pointer->len_array = 0;
+                    pointer->next = NULL;
+                    //array di rel_users è già vuoto
+                    head_rel *pointcache = cacheRel;
+                    if(pointcache!=NULL){
+                        while (pointcache->next!=NULL) {
+                            pointcache = pointcache->next;
+                        }
+                        pointcache->next = pointer;
+                    }else cacheRel = pointer;
 
                 }
             }else {
