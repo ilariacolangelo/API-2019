@@ -17,6 +17,6 @@ addrel "giova" "serena" "life"
 delrel "giova" "serena" "life"
 delent "simona"
 delrel "sara" "giova" "love"
-addrel "giova" "serena" "friend"
+addrel "giova" "serena" "bho"
 report
 end

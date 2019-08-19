@@ -13,8 +13,8 @@
 
 #define SIZEHASH 100
 #define SIZETYPEREL 10
-#define SIZEUSER 300
-#define SIZELISTUSER 200
+#define SIZEUSER 5
+#define SIZELISTUSER 5
 
 typedef struct username { char x[1024]; } username;
 
@@ -310,7 +310,7 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
                     if (cmpOrig == 0) {
                         printf("Relazione già esistente! \n");
                     } else {
-                        strcpy(pointer->rel_users[i].name_list[j+1].x, orig);
+                        strcpy(pointer->rel_users[i].name_list[j].x, orig);
                         pointer->rel_users[i].n_rel++;
                         printf("nuovo user aggiunto alla listuser di dest\n");
                     }
@@ -455,7 +455,7 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
                 //modificare struttura eliminando l'orig da userlist di dest relazione
                 pointer->rel_users[i].n_rel--;
                 while(j<(pointer->rel_users[i].n_rel)){
-                    strcpy(pointer->rel_users[i].name_list[j].x,pointer->rel_users[i].name_list[j+1].x);
+                    strcpy(pointer->rel_users[i].name_list[j].x,pointer->rel_users[i].name_list[j].x);
                     j++;
                 }
                 strcpy(pointer->rel_users[i].name_list[pointer->rel_users[i].n_rel].x,"\0");
@@ -623,7 +623,7 @@ void end(){
 }
 
 int main() {
-    int t;
+    int d,s,t;
     char action[10];
 
 
@@ -659,7 +659,21 @@ int main() {
                 printf("-");
             }else {
                 printf(" %s lenarray %d ",hashRel[t]->id_rel, hashRel[t]->len_array);
-                printf("%s+%s+%s",hashRel[t]->rel_users[0].name,hashRel[t]->rel_users[1].name,hashRel[t]->rel_users[2].name);
+                for (s=0;s<SIZEUSER;s++) {
+                    if(strcmp(hashRel[t]->rel_users[s].name,"\0")!=0) {
+                        printf("%s->listUser: ", hashRel[t]->rel_users[s].name);
+                        for (d=0; d<SIZELISTUSER;d++) {
+                            if(strcmp(hashRel[t]->rel_users[s].name_list[d].x,"\0")!=0)
+                                printf("%s", hashRel[t]->rel_users[s].name_list[d].x);
+                            else
+                                printf("@");
+                        }
+                        printf(" ");
+                    }
+                    else
+                        printf("+");
+                }
+                printf(" ");
             }
         }
         printf("\n");
