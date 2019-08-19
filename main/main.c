@@ -643,7 +643,7 @@ int main() {
             }else delrel(hash,hashRel);
 
         }else if(action[0]=='r') {
-            //report(hashRel);
+            report(hashRel);
         }else if(action[0]=='e') {
             end();
         }
