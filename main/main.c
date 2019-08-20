@@ -245,6 +245,7 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
 
     int flagRel = 0;
     int posHash;
+    int i,j;
 
     head_rel *item=NULL;
     head_rel *pointer=NULL;
@@ -254,12 +255,13 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
     if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1) {
         printf("RELAZIONE: %s\n",rel);
         posHash = hashfunc(rel,SIZETYPEREL);
+        printf("posHash %d\n",posHash);
         pointer = hashRel[posHash];
 
         while (pointer != NULL && pointer->next != NULL && strcmp(rel,pointer->id_rel)!= 0) {
             pointer = pointer->next;
         }
-        if (pointer == NULL || pointer->next == NULL) {
+        if (pointer== NULL || (pointer->next == NULL && strcmp(rel,pointer->id_rel)!= 0)) {
             printf("NUOVA: %s\n",rel);      //add new typerel
 
             if(cacheRel == NULL) {
@@ -284,17 +286,13 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
         }else {
             //pointer punta all'elemento da modificare
             //adesso cerco l'user dest
-            int i = 0;
-            int cmpDest = strcmp(pointer->rel_users[i].name, dest);
-            while (i < pointer->len_array && cmpDest != 0) {
-                i++;
+            int cmpDest = 1;
+            for (i=0; i < pointer->len_array && cmpDest != 0;i++) {
                 cmpDest = strcmp(pointer->rel_users[i].name, dest);
             }
             if (cmpDest == 0) {//dest è già presente
-                int j = 0;
-                int cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
-                while (j < pointer->rel_users[i].n_rel && cmpOrig != 0) {
-                    j++;
+                int cmpOrig =1;
+                for(j=0; j < pointer->rel_users[i].n_rel && cmpOrig != 0; j++) {
                     cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
                 }
                 if (cmpOrig == 0) {
@@ -584,6 +582,7 @@ void end(){
 
 int main() {
     int d,s,t;
+    head_rel *tem;
     char action[10];
 
 
@@ -618,8 +617,13 @@ int main() {
             if (hashRel[t]== NULL) {
                 printf("-");
             }else {
-                printf(" %s lenarray %d ",hashRel[t]->id_rel, hashRel[t]->len_array);
-                for (s=0;s<SIZEUSER;s++) {
+                tem = hashRel[t];
+                while (tem->next!=NULL) {
+                    printf(" %s lenarray %d ->",tem->id_rel, tem->len_array);
+                    tem = tem->next;
+                }
+                printf(" %s lenarray %d ->X",tem->id_rel, tem->len_array);
+                /*for (s=0;s<SIZEUSER;s++) {
                     if(strcmp(hashRel[t]->rel_users[s].name,"\0")!=0) {
                         printf("%s->listUser: ", hashRel[t]->rel_users[s].name);
                         for (d=0; d<SIZELISTUSER;d++) {
@@ -632,7 +636,7 @@ int main() {
                     }
                     else
                         printf("+");
-                }
+                }*/
                 printf(" ");
             }
         }
