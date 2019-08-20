@@ -183,13 +183,6 @@ int isInRel(char *namerel, head_rel **hash) {                     //curr start p
     }
 }
 
-int isBefore(char username1[],char username2[]) {   //lexicographic check
-    if (strcmp(username1,username2)<=0)
-        return 1;
-    else
-        return 0;
-}
-
 void addent(hash_entity *hash[]){
     char username[1024];
     hash_entity current;
@@ -347,12 +340,8 @@ void delent(hash_entity *hash[], head_rel *hashRel[]) {
             flagpoint->next = NULL;
 
             hash_entity *pointEntCache = cacheEnt;
-            if(pointEntCache!=NULL){
-                while (pointEntCache->next!=NULL) {
-                    pointEntCache = pointEntCache->next;
-                }
-                pointEntCache->next = flagpoint;
-            }else cacheEnt = flagpoint;
+            if(pointEntCache!=NULL) flagpoint->next = cacheEnt;
+            cacheEnt = flagpoint;
 
             //scansiono tutta la hashRel
             for(int i=0; i<SIZETYPEREL;i++) {
