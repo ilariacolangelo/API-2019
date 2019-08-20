@@ -248,16 +248,20 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
 
     head_rel *item=NULL;
     head_rel *pointer=NULL;
-    head_rel *create=NULL;
+    head_rel *prec=NULL;
     head_rel *temp=NULL;
 
     if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1) {
         printf("RELAZIONE: %s\n",rel);
         posHash = hashfunc(rel,SIZETYPEREL);
+        pointer = hashRel[posHash];
 
-        if(hashRel[posHash]==NULL){
-            printf("NUOVA: %s\n",rel);
-            //add new typerel
+        while (pointer != NULL && pointer->next != NULL && strcmp(rel,pointer->id_rel)!= 0) {
+            pointer = pointer->next;
+        }
+        if (pointer == NULL || pointer->next == NULL) {
+            printf("NUOVA: %s\n",rel);      //add new typerel
+
             if(cacheRel == NULL) {
                 item  = malloc(sizeof(head_rel));
             }else {
@@ -273,90 +277,46 @@ void addrel(hash_entity *hash[], head_rel *hashRel[]) {
             strcpy(item->rel_users[0].name_list[0].x,orig);
             item->next=NULL;
 
-            if(hashRel[posHash]== NULL){
-                hashRel[posHash] = item;
-            }else{ //collision
-                head_rel *point = hashRel[posHash];
-                while(point->next!=NULL){
-                    point = point->next;
-                }
-                point->next = item;
-            }
+            if(pointer == NULL) hashRel[posHash] = item;
+            else pointer->next = item;
 
-            create = NULL;
             printf("aggiunto nuovo typeRel\n");
-        }else{
-            pointer = hashRel[posHash];
-            while(pointer->next!=NULL && strcmp(rel,pointer->id_rel)!= 0){
-                pointer = pointer->next;
+        }else {
+            //pointer punta all'elemento da modificare
+            //adesso cerco l'user dest
+            int i = 0;
+            int cmpDest = strcmp(pointer->rel_users[i].name, dest);
+            while (i < pointer->len_array && cmpDest != 0) {
+                i++;
+                cmpDest = strcmp(pointer->rel_users[i].name, dest);
             }
-            if(strcmp(rel,pointer->id_rel)== 0) {
-                //pointer punta all'elemento da modificare
-                //adesso cerco l'user dest
-                int i = 0;
-                int cmpDest = strcmp(pointer->rel_users[i].name, dest);
-                while (i < pointer->len_array && cmpDest != 0) {
-                    i++;
-                    cmpDest = strcmp(pointer->rel_users[i].name, dest);
+            if (cmpDest == 0) {//dest è già presente
+                int j = 0;
+                int cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
+                while (j < pointer->rel_users[i].n_rel && cmpOrig != 0) {
+                    j++;
+                    cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
                 }
-                if (cmpDest == 0) {//dest è già presente
-                    int j = 0;
-                    int cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
-
-                    while (j < pointer->rel_users[i].n_rel && cmpOrig != 0) {
-                        j++;
-                        cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
-                    }
-                    if (cmpOrig == 0) {
-                        printf("Relazione già esistente! \n");
-                    } else {
-                        strcpy(pointer->rel_users[i].name_list[j].x, orig);
-                        pointer->rel_users[i].n_rel++;
-                        printf("nuovo user aggiunto alla listuser di dest\n");
-                    }
-
-                } else {//aggiungo dest all'array degli user e orig in pos 0 nella lista user di dest appena creato
-                    strcpy(pointer->rel_users[i].name, dest);
-                    pointer->len_array++;
-                    pointer->rel_users[i].n_rel = 1;
-                    strcpy(pointer->rel_users[i].name_list[0].x, orig);
-                    printf("nuovo user aggiunto al typeRel\n");
-                }
-                printf("modificata struttura\n");
-            }else{
-                printf("NUOVA: %s\n",rel);
-                //add new typerel
-                if(cacheRel == NULL) {
-                    item  = malloc(sizeof(head_rel));
+                if (cmpOrig == 0) {
+                    printf("Relazione già esistente! \n");
                 }else {
-                    item = cacheRel;
-                    if (item->next != NULL) {
-                        cacheRel = item->next;
-                    }else cacheRel = NULL;
-                }
-                strcpy(item->id_rel,rel);
-                item->len_array=1;
-                strcpy(item->rel_users[0].name, dest);
-                item->rel_users[0].n_rel=1;
-                strcpy(item->rel_users[0].name_list[0].x,orig);
-                item->next=NULL;
-
-                if(hashRel[posHash]== NULL){
-                    hashRel[posHash] = item;
-                }else{ //collision
-                    head_rel *point = hashRel[posHash];
-                    while(point->next!=NULL){
-                        point = point->next;
-                    }
-                    point->next = item;
+                    strcpy(pointer->rel_users[i].name_list[j].x, orig);
+                    pointer->rel_users[i].n_rel++;
+                    printf("nuovo user aggiunto alla listuser di dest\n");
                 }
 
-                create = NULL;
-                printf("aggiunto nuovo typeRel\n");
+            }else {//aggiungo dest all'array degli user e orig in pos 0 nella lista user di dest appena creato
+                strcpy(pointer->rel_users[i].name, dest);
+                pointer->len_array++;
+                pointer->rel_users[i].n_rel = 1;
+                strcpy(pointer->rel_users[i].name_list[0].x, orig);
+                printf("nuovo user aggiunto al typeRel\n");
             }
+            printf("modificata struttura\n");
         }
     }else printf("entità non monitorate\n");
 }
+
 
 void delent(hash_entity *hash[], head_rel *hashRel[]) {
     char username[1024];
@@ -429,7 +389,7 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
 
     if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1 && isInRel(rel,hashRel)==1) {
         //modifica struttura
-        posHash = hashfunc(rel,SIZETYPEREL);
+        posHash = hashfunc(rel,SIZETYPEREL);                //QI modifica inserendo is in Rel
         pointer = hashRel[posHash];
         while(strcmp(pointer->id_rel,rel)!=0) {
             prec = pointer;
@@ -455,7 +415,7 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
                 //modificare struttura eliminando l'orig da userlist di dest relazione
                 pointer->rel_users[i].n_rel--;
                 while(j<(pointer->rel_users[i].n_rel)){
-                    strcpy(pointer->rel_users[i].name_list[j].x,pointer->rel_users[i].name_list[j].x);
+                    strcpy(pointer->rel_users[i].name_list[j].x,pointer->rel_users[i].name_list[j+1].x);
                     j++;
                 }
                 strcpy(pointer->rel_users[i].name_list[pointer->rel_users[i].n_rel].x,"\0");
@@ -470,7 +430,7 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
                     pointer->rel_users[pointer->len_array].n_rel=0;
                 }
 
-                if (pointer->len_array==0){//non esistono più relazioni di quel tipo
+                if (pointer->len_array==0){//non esistono più relazioni di quel tipo        //QI non elimino nulla
                     if(prec!=NULL) {
                         if (pointer->next == NULL) { //ultimo elem di lista di collisioni
                             prec->next = NULL;
