@@ -372,7 +372,7 @@ void delent(hash_entity *hash[], head_rel *hashRel[]) {
     printf("delEnt done\n");
 }
 
-void delrel(hash_entity *hash[], head_rel *hashRel[]){
+void delrel(hash_entity *hash[], head_rel *hashRel[]) {
     char orig[1024];
     char dest[1024];
     char rel[1024];
@@ -381,84 +381,70 @@ void delrel(hash_entity *hash[], head_rel *hashRel[]){
     read(rel);
 
     int posHash;
+    int cmpRel;
 
-    head_rel *pointer=NULL;
-    head_rel *prec=NULL;
+    head_rel *pointer = NULL;
+    head_rel *prec = NULL;
 
-    if(isInHash(orig,hash)==1 && isInHash(dest,hash)==1 && isInRel(rel,hashRel)==1) {
+    if (isInHash(orig, hash) == 1 && isInHash(dest, hash) == 1) {
         //modifica struttura
-        posHash = hashfunc(rel,SIZETYPEREL);                //QI modifica inserendo is in Rel
+        posHash = hashfunc(rel, SIZETYPEREL);                //QI modifica inserendo is in Rel
         pointer = hashRel[posHash];
-        while(strcmp(pointer->id_rel,rel)!=0) {
-            prec = pointer;
-            pointer = pointer->next;
-        }
-        //pointer punta all'elemento typerel giusto e prec punta all'elemento che viene prima nella collisione altrimenti è NULL
-        //adesso cerco l'user dest
-        int i=0;
-        int cmpDest = strcmp(pointer->rel_users[i].name,dest);
-        while(i<pointer->len_array && cmpDest!=0) {
-            i++;
-            cmpDest = strcmp(pointer->rel_users[i].name,dest);
-        }
-        if(cmpDest == 0) {//dest è presente
-            int j = 0;
-            int cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
+        if (pointer != NULL) {
 
-            while(j<pointer->rel_users[i].n_rel && cmpOrig!=0) {
-                j++;
-                cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x,orig);
+            cmpRel = strcmp(pointer->id_rel, rel);
+            while (cmpRel != 0 && pointer->next != NULL) {
+                prec = pointer;
+                pointer = pointer->next;
             }
-            if(cmpOrig==0) {//orig è presente
-                //modificare struttura eliminando l'orig da userlist di dest relazione
-                pointer->rel_users[i].n_rel--;
-                while(j<(pointer->rel_users[i].n_rel)){
-                    strcpy(pointer->rel_users[i].name_list[j].x,pointer->rel_users[i].name_list[j+1].x);
-                    j++;
+            if (cmpRel == 0) {
+                //pointer punta all'elemento typerel giusto e prec punta all'elemento che viene prima nella collisione altrimenti è NULL
+                //adesso cerco l'user dest
+                int i = 0;
+                int cmpDest = strcmp(pointer->rel_users[i].name, dest);
+                while (i < pointer->len_array && cmpDest != 0) {
+                    i++;
+                    cmpDest = strcmp(pointer->rel_users[i].name, dest);
                 }
-                strcpy(pointer->rel_users[i].name_list[pointer->rel_users[i].n_rel].x,"\0");
+                if (cmpDest == 0) {//dest è presente
+                    int j = 0;
+                    int cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
 
-                if(pointer->rel_users[i].n_rel==0) {//dest senza più relazioni
-                    pointer->len_array--;
-                    while(i<(pointer->len_array)){
-                        pointer->rel_users[i] = pointer->rel_users[i+1];
-                        i++;
+                    while (j < pointer->rel_users[i].n_rel && cmpOrig != 0) {
+                        j++;
+                        cmpOrig = strcmp(pointer->rel_users[i].name_list[j].x, orig);
                     }
-                    strcpy(pointer->rel_users[pointer->len_array].name,"\0");
-                    pointer->rel_users[pointer->len_array].n_rel=0;
-                }
-
-                if (pointer->len_array==0){//non esistono più relazioni di quel tipo        //QI non elimino nulla
-                    if(prec!=NULL) {
-                        if (pointer->next == NULL) { //ultimo elem di lista di collisioni
-                            prec->next = NULL;
-                        } else {//elemento in mezzo alla lista di collisioni
-                            prec->next = pointer->next;
+                    if (cmpOrig == 0) {//orig è presente
+                        //modificare struttura eliminando l'orig da userlist di dest relazione
+                        pointer->rel_users[i].n_rel--;
+                        while (j < (pointer->rel_users[i].n_rel)) {
+                            strcpy(pointer->rel_users[i].name_list[j].x, pointer->rel_users[i].name_list[j + 1].x);
+                            j++;
                         }
+                        strcpy(pointer->rel_users[i].name_list[pointer->rel_users[i].n_rel].x, "\0");
+
+                        if (pointer->rel_users[i].n_rel == 0) {//dest senza più relazioni
+                            pointer->len_array--;
+                            while (i < (pointer->len_array)) {
+                                pointer->rel_users[i] = pointer->rel_users[i + 1];
+                                i++;
+                            }
+                            strcpy(pointer->rel_users[pointer->len_array].name, "\0");
+                            pointer->rel_users[pointer->len_array].n_rel = 0;
+                        }
+
+                    }else {
+                        printf("orig: relazione non esistente\n");
                     }
-                    strcpy(pointer->id_rel, "\0");
-                    pointer->len_array = 0;
-                    pointer->next = NULL;
-                    //array di rel_users è già vuoto
-                    head_rel *pointcache = cacheRel;
-                    if(pointcache!=NULL){
-                        while (pointcache->next!=NULL) {
-                            pointcache = pointcache->next;
-                        }
-                        pointcache->next = pointer;
-                    }else cacheRel = pointer;
-
+                }else {
+                    printf("dest: relazione non esistente\n");
                 }
-            }else {
-                printf("orig: relazione non esistente\n");
             }
         }else {
-            printf("dest: relazione non esistente\n");
+            printf("relazione non esistente\n");
         }
-    }else {
-        printf("relazione non esistente\n");
+        printf("delrel done\n");
     }
-    printf("delrel done\n");
 }
 
 void report(head_rel *hashRel[]){
