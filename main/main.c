@@ -45,7 +45,7 @@ typedef struct typeRel{                             //tipi relazioni
 
 
 entity *hash[SIZEHASH] = {NULL};
-typeRel *array_lex[64] = {NULL};
+typeRel *array_lex[78] = {NULL};
 entity *cacheEnt = NULL;
 typeRel *cacheRel = NULL;
 
@@ -67,6 +67,20 @@ void read(char string[]){                           // scanf without " "
     scanf("%s",string);
     len = strlen(string);
     string[len-1]='\0';
+}
+
+void findInHash(char username[],entity **p) {
+    int pos;
+    pos = hashfunc(username);
+    *p = hashfunc[pos];
+    if (*p!= NULL){
+        while (*p->next!=NULL && strcmp(*p->name,username)!=0){
+            *p = *p->next;
+        }
+        if(strcmp(*p->name,username)!=0) {
+            *p = NULL;
+        }
+    }
 }
 
 void addent(entity *hash[]){
@@ -95,6 +109,7 @@ void addent(entity *hash[]){
             }else cacheEnt = NULL;
         }
         strcpy(item->name,username);
+        item->len_array=0;
         item->next = NULL;
 
         if(flagpoint == NULL) hash[pos] = item;
@@ -105,7 +120,88 @@ void addent(entity *hash[]){
 }
 
 void addrel(){
-    printf("addrel\n");
+    int pos,i,j,w;
+    int index_o,index_rel;
+    char orig[1024];
+    char dest[1024];
+    char rel[1024];
+    typeRel *item;
+    typeRel *pointer;
+    typeRel *prec = NULL;
+    entity *p_orig = NULL;
+    entity *p_dest = NULL;
+    read(orig);
+    read(dest);
+    read(rel);
+
+    findInHash(orig,&p_orig);
+    findInHash(dest,&p_dest);
+
+    if (p_dest !=NULL && p_orig!=NULL) {
+
+        pos = (int) rel[0] - 45; //ASCII value of first char admitted is 45
+        pointer = array_lex[pos];
+
+        while (pointer != NULL && pointer->next != NULL && strcmp(pointer->id_rel, rel) < 0) {
+            prec = pointer;
+            pointer = pointer.next;
+        }
+        if (pointer != NULL && strcmp(pointer->id_rel, rel) == 0) { //modify structure
+
+            for(i =0; i<pointer->len_array && strcmp(pointer->dest[i].name, dest) !=0;i++) {} //find dest in array in typerel
+            if(strcmp(pointer->dest[i].name, dest) ==0) {// dest found
+                for(index_o = 0; index_o < p_orig->len_array && strcmp(p_orig->orig[index_o].name, dest)!=0 ;index_o++) {} //find orig
+                if(strcmp(p_orig->orig[index_o].name, dest)==0) { //
+                    for (index_rel = 0; index_rel<p_orig->orig[index_o].len_array && strcmp(p_orig->orig[index_o].rel[index_rel].id,rel)!=0; index_rel++) {}
+                    if(strcmp(p_orig->orig[index_o].rel[index_rel].id,rel)==0) {
+                        printf("rel già esistente");
+                }
+                else {
+                    pointer->dest[i].n_rel++;
+                    p_orig->orig[p_orig->len_array].
+                }
+            }else {
+                strcpy(pointer->dest[i].name,dest);
+                pointer->dest[i].n_rel=1;
+                pointer->len_array++;
+            }
+
+            j=i;
+            while(j>=0 && (pointer->dest[j--].n_rel < pointer->dest[i].n_rel || (pointer->dest[j--].n_rel == pointer->dest[i].n_rel && strcmp(pointer->dest[j--].name,pointer->dest[i].name)>0))) {
+                j--;
+            }
+
+            ent_dest temp;
+            temp.n_rel = pointer->dest[i].n_rel;
+            strcpy(temp.name, pointer->dest[i].name);
+
+            for (w = i; w>j+1 ;w--) {
+                pointer->dest[w] = pointer->dest[w-1];
+            }
+            pointer->dest[w] = temp;
+
+
+        } else { //create new typeRel
+            printf("NUOVA: %s\n", rel);      //add new typerel
+
+            item = malloc(sizeof(TypeRel));
+
+            strcpy(item->id_rel, rel);
+            item->len_array = 1;
+            strcpy(item->dest[0].name, dest);
+            item->dest[0].n_rel = 1;
+            item->next = NULL;
+            //add this rel in entity list orig
+
+            if (prec == NULL) array_lex[pos] = item;
+            else {
+                if (strcmp(pointer->id_rel, rel) > 0) {item->next = pointer;}
+                pointer->next = item;
+            }
+            printf("aggiunto nuovo typeRel\n");
+        }
+    }else printf("entità non monitorate\n");
+
 }
 
 void delent(){
