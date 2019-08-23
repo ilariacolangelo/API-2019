@@ -69,16 +69,16 @@ void read(char string[]){                           // scanf without " "
     string[len-1]='\0';
 }
 
-void findInHash(char username[],entity **p) {
+void findInHash(char username[],entity *p) {
     int pos;
     pos = hashfunc(username);
-    *p = hashfunc[pos];
-    if (*p!= NULL){
-        while (*p->next!=NULL && strcmp(*p->name,username)!=0){
-            *p = *p->next;
+    p = hash[pos];
+    if (p!= NULL){
+        while (p->next!=NULL && strcmp(p->name,username)!=0){
+            p = p->next;
         }
-        if(strcmp(*p->name,username)!=0) {
-            *p = NULL;
+        if(strcmp(p->name,username)!=0) {
+            p = NULL;
         }
     }
 }
@@ -134,8 +134,8 @@ void addrel(){
     read(dest);
     read(rel);
 
-    findInHash(orig,&p_orig);
-    findInHash(dest,&p_dest);
+    findInHash(orig,p_orig);
+    findInHash(dest,p_dest);
 
     if (p_dest !=NULL && p_orig!=NULL) {
 
@@ -229,7 +229,7 @@ void delent(){
     read(username);
 
     pos = hashfunc(username);
-    user = hashfunc[pos];
+    user = hash[pos];
     if (user!= NULL) {
         while (user->next != NULL && strcmp(user->name, username) != 0) {
             prec_u = user;
@@ -240,7 +240,7 @@ void delent(){
                 if(user->next!=NULL) {
                     prec_u->next=user->next;
                     user->next = NULL;
-                }else  prec_u->next==NULL;
+                }else  prec_u->next=NULL;
             }else {
                 if (user->next != NULL) {
                    hash[pos]=user->next;
@@ -273,6 +273,7 @@ void delrel(){
 }
 
 void report(){
+    int i,j;
     typeRel *pointer;
     int flag_space=0;
 
