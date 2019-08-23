@@ -125,8 +125,8 @@ void addrel(){
     char orig[1024];
     char dest[1024];
     char rel[1024];
-    typeRel *item;
-    typeRel *pointer;
+    typeRel *item=NULL;
+    typeRel *pointer=NULL;
     typeRel *prec = NULL;
     entity *p_orig = NULL;
     entity *p_dest = NULL;
@@ -138,7 +138,7 @@ void addrel(){
     findInHash(dest,&p_dest);
 
     if (p_dest !=NULL && p_orig!=NULL) {
-
+        printf("\nREL: %s\n",rel);
         pos = (int) rel[0] - 45; //ASCII value of first char admitted is 45
         pointer = array_lex[pos];
 
@@ -166,6 +166,7 @@ void addrel(){
             p_orig->orig[x].len_array++;
         }
 
+        printf("pointer rel:%s\n",pointer->id_rel);
         if (pointer != NULL && strcmp(pointer->id_rel, rel) == 0) { //modify structure
             if (exist == 1) {
                 printf("relazione già esistente\n");
@@ -197,7 +198,7 @@ void addrel(){
             }
 
         } else { //create new typeRel
-            printf("NUOVA: %s\n", rel);      //add new typerel
+            printf("New\n");      //add new typerel
 
             item = malloc(sizeof(typeRel));
 
@@ -264,6 +265,7 @@ void delent(){
                     pointer = pointer->next;
                 }
             }
+            printf("entità %s eliminata\n",username);
         }else printf("entità non monitorata\n");
     }else printf("entità non monitorata\n");
 }
