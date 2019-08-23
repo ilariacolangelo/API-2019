@@ -69,16 +69,16 @@ void read(char string[]){                           // scanf without " "
     string[len-1]='\0';
 }
 
-void findInHash(char username[],entity *p) {
+void findInHash(char username[],entity **p) {
     int pos;
     pos = hashfunc(username);
-    p = hash[pos];
-    if (p!= NULL){
-        while (p->next!=NULL && strcmp(p->name,username)!=0){
-            p = p->next;
+    *p = hash[pos];
+    if (*p!= NULL){
+        while (*p->next!=NULL && strcmp(*p->name,username)!=0){
+            *p = *p->next;
         }
-        if(strcmp(p->name,username)!=0) {
-            p = NULL;
+        if(strcmp(*p->name,username)!=0) {
+            *p = NULL;
         }
     }
 }
@@ -134,8 +134,8 @@ void addrel(){
     read(dest);
     read(rel);
 
-    findInHash(orig,p_orig);
-    findInHash(dest,p_dest);
+    findInHash(orig,&p_orig);
+    findInHash(dest,&p_dest);
 
     if (p_dest !=NULL && p_orig!=NULL) {
 
