@@ -220,7 +220,52 @@ void addrel(){
 }
 
 void delent(){
-    printf("delent\n");
+    int i,j,z;
+    int pos;
+    entity *prec_u=NULL;
+    entity *user;
+    typeRel *pointer;
+    char username[1024];
+    read(username);
+
+    pos = hashfunc(username);
+    user = hashfunc[pos];
+    if (user!= NULL) {
+        while (user->next != NULL && strcmp(user->name, username) != 0) {
+            prec_u = user;
+            user = user->next;
+        }
+        if (strcmp(user->name, username) == 0) {
+            if(prec_u != NULL){
+                if(user->next!=NULL) {
+                    prec_u->next=user->next;
+                    user->next = NULL;
+                }else  prec_u->next==NULL;
+            }else {
+                if (user->next != NULL) {
+                   hash[pos]=user->next;
+                }else hash[pos]=NULL;
+            }
+
+            if(cacheEnt!=NULL)user->next=cacheEnt;
+            cacheEnt = user;
+            user = NULL;
+
+            for (i = 0; i < 78; i++) {
+                pointer = array_lex[i];
+                while (pointer != NULL) {
+                    for (j = 0; j < pointer->len_array && strcmp(pointer->dest[j].name, username) != 0; j++) {}
+                    if (strcmp(pointer->dest[j].name, username) == 0) {
+                        pointer->len_array--;
+                        for (z = j; z < pointer->len_array; z++) {
+                            pointer->dest[z] = pointer->dest[z + 1];
+                        }
+                    }
+                    pointer = pointer->next;
+                }
+            }
+        }else printf("entità non monitorata\n");
+    }else printf("entità non monitorata\n");
 }
 
 void delrel(){
@@ -228,7 +273,26 @@ void delrel(){
 }
 
 void report(){
-    printf("report\n");
+    typeRel *pointer;
+    int flag_space=0;
+
+    for (i = 0; i < 78; i++) {
+        pointer = array_lex[i];
+        while (pointer != NULL) {
+            if(pointer->len_array>0) {
+                if(flag_space!=0){
+                    printf(" ");
+                }
+                flag_space=1;
+                printf("\"%s\" \"%s\"", pointer->id_rel, pointer->dest[0].name);
+                for (j = 0; j < pointer->len_array && pointer->dest[j + 1].n_rel == pointer->dest[j].n_rel; j++) {
+                    printf(" \"%s\"", pointer->dest[j + 1].name);
+                }
+                printf(" %d;", pointer->dest[0].n_rel);
+            }
+            pointer = pointer->next;
+        }
+    }
 }
 
 void end(){
