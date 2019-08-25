@@ -120,14 +120,16 @@ void addent(entity *hash[]){
 }
 
 void addrel(){
-    int pos,i,j,w,x,y;
-    int exist=0;
     char orig[1024];
     char dest[1024];
     char rel[1024];
-    typeRel *item=NULL;
+
+    int cmpRel;
+
+    typeRel *prec=NULL;
     typeRel *pointer=NULL;
-    typeRel *prec = NULL;
+    typeRel *item=NULL;
+
     entity *p_orig = NULL;
     entity *p_dest = NULL;
     read(orig);
@@ -140,82 +142,43 @@ void addrel(){
     if (p_dest !=NULL && p_orig!=NULL) {
         printf("\nREL: %s\n",rel);
         pos = (int) rel[0] - 45; //ASCII value of first char admitted is 45
-        pointer = array_lex[pos];
+        pointer=array_lex[pos];
 
-        while (pointer != NULL && pointer->next != NULL && strcmp(pointer->id_rel, rel) < 0) {
+        while (pointer != NULL && pointer->next != NULL && strcmp(pointer->id_rel,rel)<0) {
             prec = pointer;
             pointer = pointer->next;
         }
 
-        //check in hash of entity if this rel already exists
-        //update hash ent
-        for(x=0; x<p_orig->len_array && strcmp(p_orig->orig[x].name,dest)!=0;x++){}
-        if(strcmp(p_orig->orig[x].name,dest)==0){
-            for(y=0; y<p_orig->orig[x].len_array && strcmp(p_orig->orig[x].rel[y].id,rel)!=0;y++){}
+        if(pointer == NULL || strcmp(pointer->id_rel,rel)!=0){
+            //new
+            item  = malloc(sizeof(typeRel));
+            strcpy(item->id_rel,rel);
+            item->len_array=1;
+            strcpy(item->dest[0].name,dest);
+            item->dest[0].n_rel=1;
+            item->next=NULL;
 
-            if(strcmp(p_orig->orig[x].rel[y].id,rel)==0) {
-                exist=1;
-            }else {//add new rel to orig[x]
-                strcpy(p_orig->orig[x].rel[y].id,rel);
-                p_orig->orig[x].len_array++;
-            }
-        }else {//add new entity to orig[]
-            strcpy(p_orig->orig[x].name,dest);
-            p_orig->len_array++;
-            strcpy(p_orig->orig[x].rel[0].id,rel);
-            p_orig->orig[x].len_array++;
-        }
-
-        printf("pointer rel:%s\n",pointer->id_rel);
-        if (pointer != NULL && strcmp(pointer->id_rel, rel) == 0) { //modify structure
-            if (exist == 1) {
-                printf("relazione già esistente\n");
+            if (pointer == NULL) {
+                array_lex[pos]=item;
             }else {
-                //modifica array dest
-                for (i = 0; i < pointer->len_array && strcmp(pointer->dest[i].name, dest) != 0; i++) {} //find dest in array in typerel
-                if (strcmp(pointer->dest[i].name, dest) == 0) {// dest found
-                    pointer->dest[i].n_rel++;
-                } else {
-                    strcpy(pointer->dest[i].name, dest);
-                    pointer->dest[i].n_rel = 1;
-                    pointer->len_array++;
+                if(strcmp(pointer->id_rel,rel)<0){ //aggiunta in coda
+                    pointer->next = item;
+                }else {
+                    item->next = pointer;
+                    if(prec == NULL) { //aggiunta in testa
+                        array_lex[pos]=item;
+                    }else { //aggiunta nel mezzo
+                        prec->next=item;
+                    }
                 }
-
-                //ordina array dest
-                j = i;
-                while (j >= 0 && (pointer->dest[j--].n_rel < pointer->dest[i].n_rel || (pointer->dest[j--].n_rel == pointer->dest[i].n_rel && strcmp(pointer->dest[j--].name, pointer->dest[i].name) > 0))) {
-                    j--;
-                }
-
-                ent_dest temp;
-                temp.n_rel = pointer->dest[i].n_rel;
-                strcpy(temp.name, pointer->dest[i].name);
-
-                for (w = i; w > j + 1; w--) {
-                    pointer->dest[w] = pointer->dest[w - 1];
-                }
-                pointer->dest[w] = temp;
             }
 
-        } else { //create new typeRel
-            printf("New\n");      //add new typerel
-
-            item = malloc(sizeof(typeRel));
-
-            strcpy(item->id_rel, rel);
-            item->len_array = 1;
-            strcpy(item->dest[0].name, dest);
-            item->dest[0].n_rel = 1;
-            item->next = NULL;
-            //add this rel in entity list orig
-
-            if (prec == NULL) array_lex[pos] = item;
-            else {
-                if (strcmp(pointer->id_rel, rel) > 0) {item->next = pointer;}
-                pointer->next = item;
-            }
-            printf("aggiunto nuovo typeRel\n");
         }
+        printf("nuova rel\n");
+    }else {
+                //modifica
+                printf("modifica struttura\n");
+            }
     }else printf("entità non monitorate\n");
 
 }
@@ -247,7 +210,7 @@ void delent(){
                    hash[pos]=user->next;
                 }else hash[pos]=NULL;
             }
-
+             //eliminare tutte le relazioni di quell'utente
             if(cacheEnt!=NULL)user->next=cacheEnt;
             cacheEnt = user;
             user = NULL;
@@ -275,6 +238,7 @@ void delrel(){
 }
 
 void report(){
+    int flag_none=0;
     int i,j;
     typeRel *pointer;
     int flag_space=0;
@@ -283,6 +247,7 @@ void report(){
         pointer = array_lex[i];
         while (pointer != NULL) {
             if(pointer->len_array>0) {
+                flag_none = 1;
                 if(flag_space!=0){
                     printf(" ");
                 }
@@ -295,6 +260,9 @@ void report(){
             }
             pointer = pointer->next;
         }
+    }
+    if (flag_none == 0) {
+        printf("none");
     }
     printf("\n");
 }
