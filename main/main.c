@@ -351,8 +351,72 @@ void delent(){
     }else printf("entità non monitorata\n");
 }
 
-void delrel(){
-    printf("delrel\n");
+void delrel() {
+    char orig[1024];
+    char dest[1024];
+    char rel[1024];
+
+    int i,j,x,y,index;
+    int cmpODest = -1;
+    int cmpDest = -1;
+    int cmpRel = -1;
+
+    read(orig);
+    read(dest);
+    read(rel);
+
+    entity *p_orig = NULL;
+    entity *p_dest = NULL;
+    typeRel *p_rel = NULL;
+
+    findInHash(dest, &p_dest);
+    findInHash(orig, &p_orig);
+    findRel(rel, &p_rel);
+
+    if (p_dest != NULL && p_orig != NULL && p_rel != NULL) {
+
+        for (i = 0; (i < p_orig->len_array && cmpODest != 0); i++) {
+            cmpODest = strcmp(p_orig->odest[i].name, dest);
+        }
+        if (cmpODest == 0) {
+            i--;
+            for (j = 0; (j < p_orig->odest[i].len_array && cmpRel != 0); j++) {
+                cmpRel = strcmp(p_orig->odest[i].rel[j].id, rel);
+            }
+            if (cmpRel == 0) {
+                j--;
+                for (;j<p_orig->odest[i].len_array;j++) {
+                    p_orig->odest[i].rel[j] = p_orig->odest[i].rel[j+1];
+                }
+
+                for(x=0;x<p_rel->len_array&& cmpDest!=0;x++) {
+                    cmpDest=strcmp(p_rel->dest[x].name,dest);
+                }
+                if(cmpDest == 0) {
+                    x--;
+                    if(p_rel->dest[x].n_rel>1) {
+                        p_rel->dest[x].n_rel--;
+                        index = x;
+                        while(index>p_rel->len_array && (p_rel->dest[x].n_rel<p_rel->dest[index+1].n_rel || (p_rel->dest[x].n_rel==p_rel->dest[index+1].n_rel && strcmp(p_rel->dest[x].name,p_rel->dest[index+1].name)>0))) {
+                            index++;
+                        }
+                        ent_dest temp = p_rel->dest[x];
+                        for(y=x;y<index;y++) {
+                            p_rel->dest[y] = p_rel->dest[y+1];
+                        }
+                        p_rel->dest[index]=temp;
+
+                    }else {
+                        p_rel->len_array--;
+                        for(;x<p_rel->len_array;x++) {
+                            p_rel->dest[x]=p_rel->dest[x+1];
+                        }
+                    }
+                }
+
+            }else printf("Relazione non esistente\n");
+        }else printf("Relazione non esistente\n");
+    }else printf("Relazione non esistente\n");
 }
 
 void report(){
