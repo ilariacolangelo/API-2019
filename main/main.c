@@ -90,7 +90,7 @@ void findRel(char id_rel[], typeRel **p) {
         while ((*p)->next!=NULL && strcmp((*p)->id_rel,id_rel)<0){
             (*p) = (*p)->next;
         }
-        if(strcmp((*p)->name,username)!=0) {
+        if(strcmp((*p)->id_rel,id_rel)!=0) {
             (*p) = NULL;
         }
     }
@@ -223,11 +223,16 @@ void addrel(){
                     }
                     if(cmpTRel==0){
                         pointer->dest[z].n_rel++;
+                    }else {
+                        pointer->dest[z].n_rel=1;
+                        strcpy(pointer->dest[z].name,dest);
+                        pointer->len_array++;
                     }
+                }else {
+                    pointer->len_array=1;
+                    strcpy(pointer->dest[0].name,dest);
+                    pointer->dest[0].n_rel=1;
                 }
-                pointer->dest[z].n_rel=1;
-                strcpy(pointer->dest[z].name,dest);
-                pointer->len_array++;
 
                 int index = z;
                 while(index>0 && (pointer->dest[z].n_rel>pointer->dest[index-1].n_rel || (pointer->dest[z].n_rel==pointer->dest[index-1].n_rel && strcmp(pointer->dest[z].name,pointer->dest[index-1].name)<0))) {
@@ -257,7 +262,7 @@ void delent(){
     entity *prec_u=NULL;
     entity *user;
     typeRel *pointer;
-    typeRel *thisRel
+    typeRel *thisRel;
     char username[1024];
     read(username);
 
@@ -282,7 +287,7 @@ void delent(){
 
             for(int u=0;u<user->len_array;u++) {
                 for (int w = 0; w<user->odest[u].len_array;w++) {
-                    findRel(user->odest[u].rel[w].id,thisRel);
+                    findRel(user->odest[u].rel[w].id,&thisRel);
                     if(thisRel!= NULL){
                         //trova nel dest array di thisrel odest[u].name, decrementa e riordina
 
@@ -300,17 +305,19 @@ void delent(){
                 while (pointer != NULL) {
                     printf("1 %s\n",pointer->id_rel);
                     cmpUser = strcmp(pointer->dest[0].name, username);
-                    for (j = 0; j < pointer->len_array && cmpUser!= 0; j++) {
-                        printf("#\n");
+                    for (j = 0; j < pointer->len_array && cmpUser!=0; j++) {
+                        printf("#%s J:%d\n",pointer->dest[j].name,j);
                         cmpUser = strcmp(pointer->dest[j].name, username);
                     }
                     if (cmpUser == 0) {
-                        printf("2\n");
-                        pointer->len_array--;
-                        for (z = j; z < pointer->len_array; z++) {
-                            printf("3\n");
+                        printf("2 len %d\n",pointer->len_array);
+
+                        for (z=j-1; z < pointer->len_array; z++) {
+                            printf("3 %s",pointer->dest[z].name);
                             pointer->dest[z] = pointer->dest[z + 1];
+                            printf("-> %s\n",pointer->dest[z].name);
                         }
+                        pointer->len_array--;
                     }
                     pointer = pointer->next;
                 }
