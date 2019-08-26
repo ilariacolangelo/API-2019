@@ -182,7 +182,7 @@ void addrel(){
             p_orig->odest[i].len_array++;
 
             //analyze typeRel
-            printf("\nREL: %s\n",rel);
+            printf("REL: %s\n",rel);
             pos = (int) rel[0] - 45; //ASCII value of first char admitted is 45
             pointer=array_lex[pos];
 
@@ -222,6 +222,7 @@ void addrel(){
                         cmpTRel = strcmp(pointer->dest[z].name,dest);
                     }
                     if(cmpTRel==0){
+                        if(z!=0) z--;
                         pointer->dest[z].n_rel++;
                     }else {
                         pointer->dest[z].n_rel=1;
@@ -303,19 +304,19 @@ void delent(){
             for (i = 0; i < 78; i++) {
                 pointer = array_lex[i];
                 while (pointer != NULL) {
-                    printf("1 %s\n",pointer->id_rel);
+                    //printf("1 %s\n",pointer->id_rel);
                     cmpUser = strcmp(pointer->dest[0].name, username);
                     for (j = 0; j < pointer->len_array && cmpUser!=0; j++) {
-                        printf("#%s J:%d\n",pointer->dest[j].name,j);
+                        //printf("#%s J:%d\n",pointer->dest[j].name,j);
                         cmpUser = strcmp(pointer->dest[j].name, username);
                     }
                     if (cmpUser == 0) {
-                        printf("2 len %d\n",pointer->len_array);
+                        //printf("2 len %d\n",pointer->len_array);
 
                         for (z=j-1; z < pointer->len_array; z++) {
-                            printf("3 %s",pointer->dest[z].name);
+                            //printf("3 %s",pointer->dest[z].name);
                             pointer->dest[z] = pointer->dest[z + 1];
-                            printf("-> %s\n",pointer->dest[z].name);
+                            //printf("-> %s\n",pointer->dest[z].name);
                         }
                         pointer->len_array--;
                     }
@@ -387,6 +388,16 @@ int main() {
             report();
         }else if(action[0]=='e') {
             end();
+        }
+        for(int i = 0; i<78;i++){
+            p=array_lex[i];
+            while (p != NULL) {
+                printf("%s\n",p->id_rel);
+                for(int j=0;j<p->len_array;j++) {
+                    printf("%d %s %d\n",j,p->dest[j].name,p->dest[j].n_rel);
+                }
+                p = p->next;
+            }
         }
     } while(action[0]!='e');
 
