@@ -257,9 +257,10 @@ void addrel(){
 }
 
 void delent(){
-    int i,j,z;
+    int i,j,z,u,w,x,y,index;
     int pos;
-    int cmpUser;
+    int cmpUser=-1;
+    int cmpDest=-1;
     entity *prec_u=NULL;
     entity *user;
     typeRel *pointer;
@@ -286,12 +287,35 @@ void delent(){
                 }else hash[pos]=NULL;
             }
 
-            for(int u=0;u<user->len_array;u++) {
-                for (int w = 0; w<user->odest[u].len_array;w++) {
+            for(u=0;u<user->len_array;u++) {
+                for (w = 0; w<user->odest[u].len_array;w++) {
                     findRel(user->odest[u].rel[w].id,&thisRel);
                     if(thisRel!= NULL){
                         //trova nel dest array di thisrel odest[u].name, decrementa e riordina
+                        for(x=0;x<thisRel->len_array&& cmpDest!=0;x++) {
+                            cmpDest=strcmp(thisRel->dest[x].name,user->odest[u].name);
+                        }
+                        if(cmpDest == 0) {
+                            x--;
+                            if(thisRel->dest[x].n_rel>1) {
+                                thisRel->dest[x].n_rel--;
+                                index = x;
+                                while(index>thisRel->len_array && (thisRel->dest[x].n_rel<thisRel->dest[index+1].n_rel || (thisRel->dest[x].n_rel==thisRel->dest[index+1].n_rel && strcmp(thisRel->dest[x].name,thisRel->dest[index+1].name)>0))) {
+                                    index++;
+                                }
+                                ent_dest temp = thisRel->dest[x];
+                                for(y=x;y<index;y++) {
+                                    thisRel->dest[y] = thisRel->dest[y+1];;
+                                }
+                                thisRel->dest[index]=temp;
 
+                            }else {
+                                thisRel->len_array--;
+                                for(;x<thisRel->len_array;x++) {
+                                    thisRel->dest[x]=thisRel->dest[x+1];
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -305,7 +329,6 @@ void delent(){
                 pointer = array_lex[i];
                 while (pointer != NULL) {
                     //printf("1 %s\n",pointer->id_rel);
-                    cmpUser = strcmp(pointer->dest[0].name, username);
                     for (j = 0; j < pointer->len_array && cmpUser!=0; j++) {
                         //printf("#%s J:%d\n",pointer->dest[j].name,j);
                         cmpUser = strcmp(pointer->dest[j].name, username);
@@ -389,7 +412,7 @@ int main() {
         }else if(action[0]=='e') {
             end();
         }
-        for(int i = 0; i<78;i++){
+        /*for(int i = 0; i<78;i++){
             p=array_lex[i];
             while (p != NULL) {
                 printf("%s\n",p->id_rel);
@@ -398,7 +421,7 @@ int main() {
                 }
                 p = p->next;
             }
-        }
+        }*/
     } while(action[0]!='e');
 
 
