@@ -292,6 +292,7 @@ void delent(){
                     findRel(user->odest[u].rel[w].id,&thisRel);
                     if(thisRel!= NULL){
                         //trova nel dest array di thisrel odest[u].name, decrementa e riordina
+                        cmpDest = -1;
                         for(x=0;x<thisRel->len_array&& cmpDest!=0;x++) {
                             cmpDest=strcmp(thisRel->dest[x].name,user->odest[u].name);
                         }
@@ -329,18 +330,20 @@ void delent(){
                 pointer = array_lex[i];
                 while (pointer != NULL) {
                     //printf("1 %s\n",pointer->id_rel);
+                    cmpUser=-1;
                     for (j = 0; j < pointer->len_array && cmpUser!=0; j++) {
                         //printf("#%s J:%d\n",pointer->dest[j].name,j);
                         cmpUser = strcmp(pointer->dest[j].name, username);
                     }
                     if (cmpUser == 0) {
                         //printf("2 len %d\n",pointer->len_array);
-
+                        //printf("rel: %s j %d\n",pointer->id_rel,j);
                         for (z=j-1; z < pointer->len_array; z++) {
                             //printf("3 %s",pointer->dest[z].name);
                             pointer->dest[z] = pointer->dest[z + 1];
                             //printf("-> %s\n",pointer->dest[z].name);
                         }
+                        j=0;
                         pointer->len_array--;
                     }
                     pointer = pointer->next;
