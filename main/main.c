@@ -11,10 +11,10 @@
 #define REPORT "report"
 #define END "end"
 
-#define SIZEHASH 100
-#define SIZETYPEREL 10
-#define SIZEDEST 5
-#define SIZEORIG 5
+#define SIZEHASH 10000
+#define SIZETYPEREL 200
+#define SIZEDEST 10000
+#define SIZEORIG 10000
 
 typedef struct rel { char id[1024]; }idRel;
 
@@ -128,8 +128,8 @@ void addent(entity *hash[]){
         if(flagpoint == NULL) hash[pos] = item;
         else flagpoint->next = item;
 
-        printf("Entity:%s addent ok\n",hash[pos]->name);
-    }else printf("Entity already tracked\n");
+        //printf("Entity:%s addent ok\n",hash[pos]->name);
+    }//else printf("Entity already tracked\n");
 }
 
 void addrel(){
@@ -158,31 +158,32 @@ void addrel(){
     findInHash(dest,&p_dest);
 
     if (p_dest !=NULL && p_orig!=NULL) {
-
-        cmpDest = strcmp(p_orig->odest[i].name,dest);
+        cmpDest = -1;
         for(i=0; (i<p_orig->len_array && cmpDest!=0); i++) {
             cmpDest = strcmp(p_orig->odest[i].name,dest);
         }
         if(cmpDest == 0) {
-
-            cmpRel = strcmp(p_orig->odest[i].rel[j].id,rel);
+            if (i>0)i--;
+            cmpRel = -1;
             for(j = 0; (j<p_orig->odest[i].len_array && cmpRel != 0);j++) {
                 cmpRel = strcmp(p_orig->odest[i].rel[j].id,rel);
             }
             if(cmpRel == 0) {
                 exist = 1;
-                printf("relazione già esistente\n");
+                //printf("relazione già esistente\n");
             }
         }else {
             strcpy(p_orig->odest[i].name,dest);
             p_orig->len_array++;
         }
         if(exist == 0) {
+
+            if(j>0)j--;
             strcpy(p_orig->odest[i].rel[j].id,rel);
             p_orig->odest[i].len_array++;
 
             //analyze typeRel
-            printf("REL: %s\n",rel);
+            //printf("REL: %s\n",rel);
             pos = (int) rel[0] - 45; //ASCII value of first char admitted is 45
             pointer=array_lex[pos];
 
@@ -214,7 +215,7 @@ void addrel(){
                         }
                     }
                 }
-                printf("nuova rel\n");
+                //printf("nuova rel\n");
             }else {
                 if(pointer->len_array>0){
                     cmpTRel = strcmp(pointer->dest[z].name,dest);
@@ -246,13 +247,13 @@ void addrel(){
                 }
                 pointer->dest[index]=temp_ent;
 
-                printf("modificata rel\n");
+                //printf("modificata rel\n");
             }
 
         }
 
 
-}else printf("entità non monitorate\n");
+}//else printf("entità non monitorate\n");
 
 }
 
@@ -349,9 +350,9 @@ void delent(){
                     pointer = pointer->next;
                 }
             }
-            printf("entità %s eliminata\n",username);
-        }else printf("entità non monitorata\n");
-    }else printf("entità non monitorata\n");
+            //printf("entità %s eliminata\n",username);
+        }//else printf("entità non monitorata\n");
+    }//else printf("entità non monitorata\n");
 }
 
 void delrel() {
@@ -417,9 +418,9 @@ void delrel() {
                     }
                 }
 
-            }else printf("Relazione non esistente\n");
-        }else printf("Relazione non esistente\n");
-    }else printf("Relazione non esistente\n");
+            }//else printf("Relazione non esistente\n");
+        }//else printf("Relazione non esistente\n");
+    }//else printf("Relazione non esistente\n");
 }
 
 void report(){
@@ -453,15 +454,31 @@ void report(){
 }
 
 void end(){
-    printf("end\n");
+    //printf("end\n");
 }
 
 int main() {
     char action[10];
+    //int count = 0;
+    //entity *pKA;
     typeRel *p;
     do{
-
         scanf("%s", action);
+        //count++;
+        //printf("%d)\n",count);
+        /*if(count == 57) {
+            findInHash("RJP",&pKA);
+            if(pKA!= NULL) {
+                printf("TRENTASEI\n");
+                for (int i = 0; i < 5; i++) {
+                    printf("name: %s rel:", pKA->odest[i].name);
+                    for (int j = 0; j < pKA->odest[i].len_array; j++) {
+                        printf(" %s &", pKA->odest[i].rel[j].id);
+                    }
+                    printf("\n");
+                }
+            }
+        }*/
         if(action[0]=='a') {
 
             if(action[3]=='e') {
@@ -492,5 +509,5 @@ int main() {
     } while(action[0]!='e');
 
 
-    printf("end of file\n");
+    //printf("end of file\n");
 }
