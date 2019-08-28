@@ -264,7 +264,7 @@ void delent(){
     int cmpDest=-1;
     entity *prec_u=NULL;
     entity *user;
-    typeRel *pointer;
+    typeRel *pointer,*p;
     typeRel *thisRel;
     char username[1024];
     read(username);
@@ -302,12 +302,13 @@ void delent(){
                             if(thisRel->dest[x].n_rel>1) {
                                 thisRel->dest[x].n_rel--;
                                 index = x;
-                                while(index>thisRel->len_array && (thisRel->dest[x].n_rel<thisRel->dest[index+1].n_rel || (thisRel->dest[x].n_rel==thisRel->dest[index+1].n_rel && strcmp(thisRel->dest[x].name,thisRel->dest[index+1].name)>0))) {
+                                while(index<thisRel->len_array && (thisRel->dest[x].n_rel<thisRel->dest[index+1].n_rel || (thisRel->dest[x].n_rel==thisRel->dest[index+1].n_rel && strcmp(thisRel->dest[x].name,thisRel->dest[index+1].name)>0))) {
                                     index++;
                                 }
+                                if(index == thisRel->len_array) index--;
                                 ent_dest temp = thisRel->dest[x];
                                 for(y=x;y<index;y++) {
-                                    thisRel->dest[y] = thisRel->dest[y+1];;
+                                    thisRel->dest[y] = thisRel->dest[y+1];
                                 }
                                 thisRel->dest[index]=temp;
 
@@ -401,9 +402,10 @@ void delrel() {
                     if(p_rel->dest[x].n_rel>1) {
                         p_rel->dest[x].n_rel--;
                         index = x;
-                        while(index>p_rel->len_array && (p_rel->dest[x].n_rel<p_rel->dest[index+1].n_rel || (p_rel->dest[x].n_rel==p_rel->dest[index+1].n_rel && strcmp(p_rel->dest[x].name,p_rel->dest[index+1].name)>0))) {
+                        while(index<p_rel->len_array && (p_rel->dest[x].n_rel<p_rel->dest[index+1].n_rel || (p_rel->dest[x].n_rel==p_rel->dest[index+1].n_rel && strcmp(p_rel->dest[x].name,p_rel->dest[index+1].name)>0))) {
                             index++;
                         }
+                        if(index == p_rel->len_array) index--;
                         ent_dest temp = p_rel->dest[x];
                         for(y=x;y<index;y++) {
                             p_rel->dest[y] = p_rel->dest[y+1];
@@ -439,8 +441,8 @@ void report(){
                 }
                 flag_space=1;
                 printf("\"%s\" \"%s\"", pointer->id_rel, pointer->dest[0].name);
-                for (j = 0; j < pointer->len_array && pointer->dest[j + 1].n_rel == pointer->dest[j].n_rel; j++) {
-                    printf(" \"%s\"", pointer->dest[j + 1].name);
+                for (j = 1; j < pointer->len_array && pointer->dest[j].n_rel == pointer->dest[0].n_rel; j++) {
+                    printf(" \"%s\"", pointer->dest[j].name);
                 }
                 printf(" %d;", pointer->dest[0].n_rel);
             }
@@ -459,8 +461,8 @@ void end(){
 
 int main() {
     char action[10];
-    //int count = 0;
-    //entity *pKA;
+    int count = 0;
+    entity *pKA;
     typeRel *p;
     do{
         scanf("%s", action);
@@ -496,14 +498,16 @@ int main() {
         }else if(action[0]=='e') {
             end();
         }
-        /*for(int i = 0; i<78;i++){
-            p=array_lex[i];
-            while (p != NULL) {
-                printf("%s\n",p->id_rel);
-                for(int j=0;j<p->len_array;j++) {
-                    printf("%d %s %d\n",j,p->dest[j].name,p->dest[j].n_rel);
+        /*if(count == 122 || count == 123) {
+            for (int i = 0; i < 78; i++) {
+                p = array_lex[i];
+                while (p != NULL) {
+                    printf("%s\n", p->id_rel);
+                    for (int j = 0; j < p->len_array; j++) {
+                        printf("%d %s %d\n", j, p->dest[j].name, p->dest[j].n_rel);
+                    }
+                    p = p->next;
                 }
-                p = p->next;
             }
         }*/
     } while(action[0]!='e');
