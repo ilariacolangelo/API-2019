@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="dd6c1813-60d1-4dc8-ad21-bd8dae7cd86e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/main.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="273">
+              <caret line="135" column="27" selection-start-line="135" selection-start-column="27" selection-end-line="135" selection-end-column="27" />
+              <folding>
+                <element signature="e#567#726#0" />
+                <element signature="e#743#902#0" />
+                <element signature="e#1032#1293#0" />
+                <element signature="e#1295#1535#0" />
+                <element signature="e#1537#1866#0" />
+                <element signature="e#1868#2185#0" />
+                <element signature="e#14370#15863#0" />
+                <element signature="e#14553#14999#0" />
+                <element signature="e#15375#15799#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/old_main2.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="562">
+              <caret line="521" column="1" selection-start-line="521" selection-start-column="1" selection-end-line="521" selection-end-column="1" />
+              <folding>
+                <element signature="e#340#369#0" />
+                <element signature="e#385#473#0" />
+                <element signature="e#493#548#0" />
+                <element signature="e#567#726#0" />
+                <element signature="e#743#902#0" />
+                <element signature="e#1032#1293#0" />
+                <element signature="e#1295#1535#0" />
+                <element signature="e#1537#1866#0" />
+                <element signature="e#1868#2185#0" />
+                <element signature="e#2187#3486#0" />
+                <element signature="e#3488#7222#0" />
+                <element signature="e#7224#11301#0" />
+                <element signature="e#11303#13640#0" />
+                <element signature="e#13642#14489#0" />
+                <element signature="e#14491#14527#0" />
+                <element signature="e#14529#16010#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="3" lean-forward="true" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>Jose</find>
+      <find>RA</find>
+      <find>RA_B</find>
+    </findStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/old_main.c" />
+        <option value="$PROJECT_DIR$/old_main2.c" />
+        <option value="$PROJECT_DIR$/input.txt" />
+        <option value="$PROJECT_DIR$/main.c" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane" />
+    </panes>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="45156000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17689823" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32876712" />
+      <window_info anchor="bottom" id="Database Changes" order="7" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.32876712" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.37671232" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17689823" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32876712" />
+      <window_info anchor="bottom" id="Database Changes" order="7" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.32876712" />
+      <window_info anchor="bottom" id="Terminal" order="9" weight="0.2479452" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout-to-restore>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/old_main.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1185">
+          <caret line="311" column="54" lean-forward="true" selection-start-line="311" selection-start-column="54" selection-end-line="311" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#1100#1367#0" />
+            <element signature="e#1369#1609#0" />
+            <element signature="e#1611#4396#0" />
+            <element signature="e#4398#4903#0" />
+            <element signature="e#4905#5437#0" />
+            <element signature="e#14694#19734#0" />
+            <element signature="e#19736#19770#0" />
+            <element signature="e#19772#21688#0" />
+            <element signature="e#21692#25236#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/old_main2.0.cpp">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/old_main2.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="562">
+          <caret line="521" column="1" selection-start-line="521" selection-start-column="1" selection-end-line="521" selection-end-column="1" />
+          <folding>
+            <element signature="e#340#369#0" />
+            <element signature="e#385#473#0" />
+            <element signature="e#493#548#0" />
+            <element signature="e#567#726#0" />
+            <element signature="e#743#902#0" />
+            <element signature="e#1032#1293#0" />
+            <element signature="e#1295#1535#0" />
+            <element signature="e#1537#1866#0" />
+            <element signature="e#1868#2185#0" />
+            <element signature="e#2187#3486#0" />
+            <element signature="e#3488#7222#0" />
+            <element signature="e#7224#11301#0" />
+            <element signature="e#11303#13640#0" />
+            <element signature="e#13642#14489#0" />
+            <element signature="e#14491#14527#0" />
+            <element signature="e#14529#16010#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="3" lean-forward="true" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="135" column="27" selection-start-line="135" selection-start-column="27" selection-end-line="135" selection-end-column="27" />
+          <folding>
+            <element signature="e#567#726#0" />
+            <element signature="e#743#902#0" />
+            <element signature="e#1032#1293#0" />
+            <element signature="e#1295#1535#0" />
+            <element signature="e#1537#1866#0" />
+            <element signature="e#1868#2185#0" />
+            <element signature="e#14370#15863#0" />
+            <element signature="e#14553#14999#0" />
+            <element signature="e#15375#15799#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
