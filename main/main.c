@@ -191,6 +191,7 @@ void addrel() {
             while (temp_head!=NULL && temp_head->next!=NULL && temp_head->name != p_dest){          // cerca il dest nella lista di headReport
                 temp_head = temp_head->next;
             }
+            printf("1\n");
             if(temp_head!=NULL && temp_head->name == p_dest) {         //trovato dest
                 temp_orig = temp_head->first_orig;
                 while (temp_orig!=NULL && temp_orig->next!=NULL && temp_orig->name != p_orig){          // cerca orig nella lista di origEnt
@@ -201,6 +202,7 @@ void addrel() {
                     return;
                 }
             }else {
+                printf("2\n");
                 if(cacheHead == NULL) {                     //mi creo elemento per headReport controllando la cacheHead
                     item_head = malloc(sizeof(headReport));
                 }else {
@@ -227,7 +229,7 @@ void addrel() {
                     item_hash_head = cacheHashHead;
                     cacheHashHead = item_hash_head->next;
                 }
-
+                printf("3\n");
                 item_hash_head->p = item_head;                  //aggancio entity alla struttura delle rel
                 item_hash_head->next=p_dest->head_list;
                 p_dest->head_list = item_hash_head;
@@ -242,40 +244,41 @@ void addrel() {
                 item_orig = cacheOrig;
                 cacheOrig = item_orig->next;
             }
-
+            printf("4\n");
             item_orig->dest = temp_head;                //riempo origRel
             item_orig->name = p_orig;
             item_orig->prec = NULL;
             item_orig->next = temp_head->first_orig;    // aggiunto in testa
+            printf("4.1\n");
+            temp_head->first_orig->prec = item_orig;    //SEGFAULT
+            printf("4.1.1\n");
             temp_head->first_orig = item_orig;
-            item_orig->next->prec = item_orig;
-
+            printf("4.2\n");
             if(cacheHashOrig == NULL) {                     //mi creo elemento per orig_in_hash controllando la cache
                 item_hash_orig = malloc(sizeof(orig_in_hash));
             }else {
                 item_hash_orig = cacheHashOrig;
                 cacheHashOrig = item_hash_orig->next;
             }
-
+            printf("4.3\n");
             item_hash_orig->p = item_orig;                  //aggancio entity alla struttura delle rel
             item_hash_orig->next = p_orig->orig_list;
             p_orig->orig_list = item_hash_orig;
 
             temp_head->n_rel++;
-
+            printf("5\n");
             //RIORDINAMENTO LISTA REPORT
             index_head = temp_head;
             while(index_head->prec != NULL && (temp_head->n_rel>index_head->prec->n_rel|| (temp_head->n_rel==index_head->prec->n_rel && strcmp(temp_head->name->name,index_head->prec->name->name)<0))) {
                 index_head = index_head->prec;
             }
-
+            printf("6\n");
             if(index_head->prec != NULL) { //aggiungo in testa
                 temp_head->prec->next = NULL;
                 temp_head->prec = NULL;
                 temp_head->next = index_head;
                 index_head->prec = temp_head;
                 p_rel->head_list = temp_head;
-
             }else if(index_head != temp_head) { //aggiungo in mezzo
                 temp_head->prec->next = NULL;
                 temp_head->prec = index_head->prec;
