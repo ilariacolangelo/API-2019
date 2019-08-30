@@ -185,28 +185,29 @@ void addrel() {
         findRel(rel, &p_rel, &prec_rel);    //cerco typeRel
         printf("rel found %s\n",p_rel->id_rel);
 
-        if(p_rel!=NULL){    //typeRel già presente
+        if(p_rel!=NULL) {    //typeRel già presente
             printf("da modificare \n");
             temp_head = p_rel->head_list;
-            while (temp_head!=NULL && temp_head->next!=NULL && temp_head->name != p_dest){          // cerca il dest nella lista di headReport
+            while (temp_head != NULL && temp_head->next != NULL &&
+                   temp_head->name != p_dest) {          // cerca il dest nella lista di headReport
                 temp_head = temp_head->next;
             }
-            
 
-            if(temp_head!=NULL && temp_head->name == p_dest) {         //trovato dest
+            if (temp_head != NULL && temp_head->name == p_dest) {         //trovato dest
                 temp_orig = temp_head->first_orig;
-                while (temp_orig!=NULL && temp_orig->next!=NULL && temp_orig->name != p_orig){          // cerca orig nella lista di origEnt
-                    temp_orig= temp_orig->next;
+                while (temp_orig != NULL && temp_orig->next != NULL &&
+                       temp_orig->name != p_orig) {          // cerca orig nella lista di origEnt
+                    temp_orig = temp_orig->next;
                 }
-                if(temp_orig != NULL && temp_orig->name == p_orig) {    //trovato orig
-                  printf("relazione già esistente\n");
+                if (temp_orig != NULL && temp_orig->name == p_orig) {    //trovato orig
+                    printf("relazione già esistente\n");
                     return;
                 }
-            }else {
+            } else {
 
-                if(cacheHead == NULL) {                     //mi creo elemento per headReport controllando la cacheHead
+                if (cacheHead == NULL) {                     //mi creo elemento per headReport controllando la cacheHead
                     item_head = malloc(sizeof(headReport));
-                }else {
+                } else {
                     item_head = cacheHead;
                     cacheHead = item_head->next;
                 }
@@ -215,24 +216,24 @@ void addrel() {
                 item_head->next = NULL;
                 item_head->name = p_dest;
 
-                if(temp_head == NULL) {
+                if (temp_head == NULL) {
                     p_rel->head_list = item_head;
                     item_head->prec = NULL;
-                }
-                else {                              //temp_head punta alla coda della lista
+                } else {                              //temp_head punta alla coda della lista
                     temp_head->next = item_head;
                     item_head->prec = temp_head;
                 }
 
-                if(cacheHashHead == NULL) {                     //mi creo elemento per head_in_hash controllando la cache
+                if (cacheHashHead ==
+                    NULL) {                     //mi creo elemento per head_in_hash controllando la cache
                     item_hash_head = malloc(sizeof(head_in_hash));
-                }else {
+                } else {
                     item_hash_head = cacheHashHead;
                     cacheHashHead = item_hash_head->next;
                 }
 
                 item_hash_head->p = item_head;                  //aggancio entity alla struttura delle rel
-                item_hash_head->next=p_dest->head_list;
+                item_hash_head->next = p_dest->head_list;
                 p_dest->head_list = item_hash_head;
 
                 temp_head = item_head; //temp punta al dest
@@ -240,13 +241,12 @@ void addrel() {
             }
 
             //aggiungo orig
-            if(cacheOrig == NULL) {                     //mi creo elemento per origRel controllando la cacheOrig
+            if (cacheOrig == NULL) {                     //mi creo elemento per origRel controllando la cacheOrig
                 item_orig = malloc(sizeof(origRel));
-            }else {
+            } else {
                 item_orig = cacheOrig;
                 cacheOrig = item_orig->next;
             }
-
 
             temp_head->first_orig = item_orig;          //riempo origRel
             item_orig->dest = temp_head;
@@ -258,9 +258,9 @@ void addrel() {
 
             temp_head->first_orig = item_orig;
 
-            if(cacheHashOrig == NULL) {                     //mi creo elemento per orig_in_hash controllando la cache
+            if (cacheHashOrig == NULL) {                     //mi creo elemento per orig_in_hash controllando la cache
                 item_hash_orig = malloc(sizeof(orig_in_hash));
-            }else {
+            } else {
                 item_hash_orig = cacheHashOrig;
                 cacheHashOrig = item_hash_orig->next;
             }
@@ -273,24 +273,25 @@ void addrel() {
 
             //RIORDINAMENTO LISTA REPORT
             index_head = temp_head;
-            while(index_head->prec != NULL && (temp_head->n_rel>index_head->prec->n_rel|| (temp_head->n_rel==index_head->prec->n_rel && strcmp(temp_head->name->name,index_head->prec->name->name)<0))) {
+            while (index_head->prec != NULL && (temp_head->n_rel > index_head->prec->n_rel ||
+                                                (temp_head->n_rel == index_head->prec->n_rel &&
+                                                 strcmp(temp_head->name->name, index_head->prec->name->name) < 0))) {
                 index_head = index_head->prec;
             }
-
-            if(index_head->prec == NULL) { //aggiungo in testa
-
-                temp_head->prec->next = NULL;
-                temp_head->prec = NULL;
-                temp_head->next = index_head;
-                index_head->prec = temp_head;
-                p_rel->head_list = temp_head;
-            }else if(index_head != temp_head) { //aggiungo in mezzo
-                printf("8\n");
-                temp_head->prec->next = NULL;
-                temp_head->prec = index_head->prec;
-                index_head->prec->next = temp_head;
-                temp_head->next = index_head;
-                index_head->prec = temp_head;
+            if(index_head != temp_head){ //Se devo spostarlo
+                if (index_head->prec == NULL) { //aggiungo in testa
+                    temp_head->prec->next = NULL;
+                    temp_head->prec = NULL;
+                    temp_head->next = index_head;
+                    index_head->prec = temp_head;
+                    p_rel->head_list = temp_head;
+                }else { //aggiungo in mezzo
+                    temp_head->prec->next = NULL;
+                    temp_head->prec = index_head->prec;
+                    index_head->prec->next = temp_head;
+                    temp_head->next = index_head;
+                    index_head->prec = temp_head;
+                }
             }
             // LISTA REPORT MODIFICATA
 
@@ -332,13 +333,13 @@ void addrel() {
             item_head->prec = NULL;
             item_head->name = p_dest;
             item_head->first_orig = item_orig;
-            //printf(" first orig %s\n",item_head->first_orig->name->name);
+
 
             item_orig->dest = item_head;                //riempo origRel
             item_orig->prec = NULL;
             item_orig->next = NULL;
             item_orig->name = p_orig;
-            printf("first orig %s %p\n",item_head->first_orig->name->name, item_head->first_orig);
+
             if(cacheHashHead == NULL) {                     //mi creo elemento per head_in_hash controllando la cache
                 item_hash_head = malloc(sizeof(head_in_hash));
             }else {

@@ -3,7 +3,7 @@ addent "giova"
 addent "serena"
 addent "serena"
 addrel "sara" "giova" "love"
-addrel "ila" "giova" "love"
+addrel "serena" "giova" "love"
 addrel "sara" "serena" "little"
 addrel "serena" "sara" "little"
 end
