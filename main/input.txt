@@ -5,5 +5,6 @@ addent "serena"
 addrel "sara" "giova" "love"
 addrel "serena" "giova" "love"
 addrel "sara" "serena" "little"
+delrel "sara" "serena" "little"
 addrel "serena" "sara" "little"
 end

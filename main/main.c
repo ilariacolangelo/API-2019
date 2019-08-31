@@ -9,11 +9,13 @@
 typedef struct head_in_hash {
     struct headReport *p;
     struct head_in_hash *next;
+    struct head_in_hash *prec;
 }head_in_hash;
 
 typedef struct orig_in_hash {
     struct origRel *p;
     struct orig_in_hash *next;
+    struct orig_in_hash *prec;
 }orig_in_hash;
 
 typedef struct origRel {
@@ -226,8 +228,7 @@ void addrel() {
                     item_head->prec = temp_head;
                 }
 
-                if (cacheHashHead ==
-                    NULL) {                     //mi creo elemento per head_in_hash controllando la cache
+                if (cacheHashHead ==NULL) {                     //mi creo elemento per head_in_hash controllando la cache
                     item_hash_head = malloc(sizeof(head_in_hash));
                 } else {
                     item_hash_head = cacheHashHead;
@@ -236,6 +237,8 @@ void addrel() {
 
                 item_hash_head->p = item_head;                  //aggancio entity alla struttura delle rel
                 item_hash_head->next = p_dest->head_list;
+                item_hash_head->prec = NULL;
+                if(p_dest->head_list!=NULL) p_dest->head_list->prec = item_hash_head;
                 p_dest->head_list = item_hash_head;
 
                 temp_head = item_head; //temp punta al dest
@@ -250,14 +253,11 @@ void addrel() {
                 cacheOrig = item_orig->next;
             }
 
-            temp_head->first_orig = item_orig;          //riempo origRel
-            item_orig->dest = temp_head;
+            item_orig->dest = temp_head;            //riempo origRel
             item_orig->name = p_orig;
             item_orig->prec = NULL;
             item_orig->next = temp_head->first_orig;    // aggiunto in testa
-
-            temp_head->first_orig->prec = item_orig;    //SEGFAULT
-
+            if(temp_head->first_orig!=NULL) temp_head->first_orig->prec = item_orig;    //SEGFAULT
             temp_head->first_orig = item_orig;
 
             if (cacheHashOrig == NULL) {                     //mi creo elemento per orig_in_hash controllando la cache
@@ -360,10 +360,12 @@ void addrel() {
 
             item_hash_head->p = item_head;                  //aggancio entity alla struttura delle rel
             item_hash_head->next=p_dest->head_list;
+            item_hash_head->prec = NULL;
             p_dest->head_list = item_hash_head;
 
             item_hash_orig->p = item_orig;                  //
             item_hash_orig->next = p_orig->orig_list;
+            item_hash_orig->prec = NULL;
             p_orig->orig_list = item_hash_orig;
 
             printf("rel aggiunta\n");
@@ -384,7 +386,10 @@ void delrel() {
     entity *p_dest;
     entity *p_orig;
     head_in_hash *tempHeadInHash;
+    orig_in_hash *tempOrigInHash;
+    headReport *index_head;
     origRel *tempOrig;
+    headReport *tempHead;
     typeRel *p_rel;
     typeRel *prec_rel;
 
@@ -410,8 +415,113 @@ void delrel() {
             }
             if(tempOrig == NULL){ //dest esiste  ma non esiste orig in quella typerel
                 printf("relanzione non esistente\n");
-            }else {
-                //MODIFICA STRUTTURA
+            }else {//MODIFICA STRUTTURA
+
+                tempHead = tempHeadInHash->p;
+
+                //cerca orig_in_hash in p_orig
+                tempOrigInHash = p_orig->orig_list;
+                while(tempOrigInHash!=NULL && tempOrigInHash->p != tempOrig ) {
+                    tempOrigInHash = tempOrigInHash->next;
+                }
+
+                //elimina da entity head_in_hash && orig_in_hash
+                if(tempOrigInHash->prec!=NULL){
+                    tempOrigInHash->prec->next = tempOrigInHash->next;
+                }else {
+                    p_orig->orig_list = tempOrigInHash->next; //cambia testa della lista
+                }
+
+                if(tempOrigInHash->next!=NULL){
+                    tempOrigInHash->next->prec = tempOrigInHash->prec;
+                }
+
+                tempOrigInHash->prec = NULL;         //sposta in cache
+                tempOrigInHash->p=NULL;
+                tempOrigInHash->next = cacheHashOrig;
+                cacheHashOrig = tempOrigInHash;
+
+
+
+                if(tempHeadInHash->prec!=NULL){
+                    tempHeadInHash->prec->next = tempHeadInHash->next;
+                }else {
+                    p_dest->head_list = tempHeadInHash->next; //cambia testa della lista
+                }
+
+                if(tempHeadInHash->next!=NULL){
+                    tempHeadInHash->next->prec = tempHeadInHash->prec;
+                }
+
+                tempHeadInHash->prec = NULL;         //sposta cache
+                tempHeadInHash->p=NULL;
+                tempHeadInHash->next = cacheHashHead;
+                cacheHashHead = tempHeadInHash;
+
+
+
+                //elimina origEnt nella struttura delle rel
+                if(tempOrig->prec!=NULL){
+                    tempOrig->prec->next = tempOrig->next;
+                }else {
+                    tempOrig->dest->first_orig = tempOrig->next; //cambia testa della lista
+                }
+
+                if(tempOrig->next!=NULL){
+                    tempOrig->next->prec = tempOrig->prec;
+                }
+
+                tempOrig->prec = NULL;         //sposta orig in cache
+                tempOrig->dest = NULL;
+                tempOrig->name = NULL;
+                tempOrig->next = cacheOrig;
+                cacheOrig = tempOrig;
+
+                //decrementa di una relazione dest
+                tempHead->n_rel--;
+                if(tempHead->n_rel>0){ //riordina dest
+
+                    index_head = tempHead;
+                    while (index_head->next != NULL && (index_head->next->n_rel>tempHead->n_rel || (index_head->next->n_rel==tempHead->n_rel && strcmp(tempHead->name->name,index_head->name->name)>0)) ) {
+                        index_head = index_head->next;
+                    }
+
+                    if(index_head != tempHead) { //va spostato
+
+                        //estrazione
+                        if(tempHead->prec!=NULL){
+                            tempHead->prec->next = tempHead->next;
+                        }else {
+                            tempHead->rel->head_list = tempHead->next; //cambia testa della lista
+                        }
+                        tempHead->next->prec = tempHead->prec;
+
+                        //riposizionamento
+                        tempHead->prec=index_head;
+                        tempHead->next=index_head->next;
+                        if(index_head->next != NULL) index_head->next->prec = tempHead;
+                        index_head->next = tempHead;
+
+                    }
+
+                }else {//elimina dalla lista il dest
+                    if(tempHead->prec!=NULL){
+                        tempHead->prec->next = tempHead->next;
+                    }else {
+                        tempHead->rel->head_list = tempHead->next; //cambia testa della lista
+                    }
+
+                    if(tempHead->next!=NULL){
+                        tempHead->next->prec = tempHead->prec;
+                    }
+
+                    tempHead->prec = NULL;
+                    tempHead->rel = NULL;
+                    tempHead->name = NULL;
+                    tempHead->next = cacheHead;
+                    cacheHead = tempHead;
+
+                }
                 printf("DELREL modifica struttura\n");
             }
         }
