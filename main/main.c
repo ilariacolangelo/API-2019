@@ -137,7 +137,7 @@ void addent(){
         item->next = NULL;
 
         hash[pos] = item;
-        printf("aggiunta %s\n",username);
+        //printf("aggiunta %s\n",username);
     }else if(flagpoint->next == NULL && strcmp(username,flagpoint->name)!= 0) {
         if(cacheEnt == NULL) {
             item = malloc(sizeof(entity)); //allocate memory for entity-struct
@@ -153,8 +153,8 @@ void addent(){
         item->next = NULL;
 
         flagpoint->next = item;
-        printf("aggiunta %s\n",username);
-    }else printf("presente %s\n",username);
+        //printf("aggiunta %s\n",username);
+    }//else printf("presente %s\n",username);
 }
 
 void addrel() {
@@ -186,10 +186,10 @@ void addrel() {
     if (p_dest!= NULL && p_orig!=NULL) {    //entità presenti in hash
 
         findRel(rel, &p_rel, &prec_rel);    //cerco typeRel
-        printf("rel found %s\n",p_rel->id_rel);
+        //printf("rel found %s\n",p_rel->id_rel);
 
         if(p_rel!=NULL) {    //typeRel già presente
-            printf("da modificare \n");
+            //printf("da modificare \n");
             temp_head = p_rel->head_list;
             while (temp_head != NULL && temp_head->next != NULL &&
                    temp_head->name != p_dest) {          // cerca il dest nella lista di headReport
@@ -202,7 +202,7 @@ void addrel() {
                     temp_orig = temp_orig->next;
                 }
                 if (temp_orig != NULL && temp_orig->name == p_orig) {    //trovato orig
-                    printf("relazione già esistente\n");
+                    //printf("relazione già esistente\n");
                     return;
                 }
             } else {
@@ -298,7 +298,7 @@ void addrel() {
             }
             // LISTA REPORT MODIFICATA
 
-            printf("modificata \n");
+            //printf("modificata \n");
 
         }else {     //creo nuovo typeRel
             item_rel = malloc(sizeof(typeRel));         //mi creo elemento per typeRel
@@ -369,11 +369,9 @@ void addrel() {
             item_hash_orig->prec = NULL;
             p_orig->orig_list = item_hash_orig;
 
-            printf("rel aggiunta\n");
+            //printf("rel aggiunta\n");
         }
 
-    }else {
-        printf("entità non monitorate\n");
     }
 }
 
@@ -393,7 +391,7 @@ void delent(){
     findInHash(username,&p_user);
 
     if(p_user != NULL){
-        printf("1\n");
+
         //elimino user tutte le volte che è stato orig
         tempOrigInHash = p_user->orig_list;
         while(tempOrigInHash!= NULL) {
@@ -407,7 +405,7 @@ void delent(){
             } else {
                 tempOrig->dest->first_orig = tempOrig->next; //cambia testa della lista
             }
-            printf("2\n");
+
             if (tempOrig->next != NULL) {
                 tempOrig->next->prec = tempOrig->prec;
             }
@@ -418,7 +416,7 @@ void delent(){
             tempOrig->next = cacheOrig;
             cacheOrig = tempOrig;
 
-            printf("3\n");
+
             //decrementa di una relazione dest
             tempHead->n_rel--;
             if (tempHead->n_rel > 0) { //riordina dest
@@ -431,7 +429,7 @@ void delent(){
                 }
 
                 if (index_head != tempHead) { //va spostato
-                    printf("4\n");
+
                     //estrazione
                     if (tempHead->prec != NULL) {
                         tempHead->prec->next = tempHead->next;
@@ -448,7 +446,7 @@ void delent(){
 
                 }
             }
-            printf("5\n");
+
             tempOrigInHash->prec = NULL;
             tempOrigInHash->p = NULL;
             tempOrigInHash = tempOrigInHash->next;
@@ -461,7 +459,6 @@ void delent(){
         tempOrig = NULL;
         tempHead = NULL;
 
-        printf("6\n");
         //elimino user tutte le volte che è stato dest
         tempHeadInHash = p_user->head_list;
         while (tempHeadInHash!=NULL){
@@ -478,38 +475,26 @@ void delent(){
                 tempHead->next->prec = tempHead->prec;
             }
 
-            printf("7\n");
             //svuoto la head da tutti i suoi orig
             tempOrig = tempHead->first_orig;
             while(tempOrig!=NULL){
-                printf("7.1\n");
                precOrig = tempOrig;
                tempOrigInHash = tempOrig->name->orig_list;
-                printf("7.1.1\n");
                while(tempOrigInHash->p != tempOrig){
-                   printf("7.1.2\n");
                    tempOrigInHash = tempOrigInHash->next;
-                   printf("7.1.3\n");
                }
-                printf("7.1.4\n");
                 //elimino orig_in_hash da entity
                 if(tempOrigInHash->prec!=NULL){
-                    printf("7.1.5\n");
                     //printf("%s\n",tempOrigInHash->prec->next->p->name->name);
                     (tempOrigInHash->prec)->next = tempOrigInHash->next;
-                    printf("7.1.6\n");
 
                 }else {
-                    printf("7.1.7\n");
                     tempOrig->name->orig_list = tempOrigInHash->next; //cambia testa della lista
-                    printf("7.1.8\n");
                 }
-                printf("7.2\n");
                 if(tempOrigInHash->next!=NULL){
                     tempOrigInHash->next->prec = tempOrigInHash->prec;
                 }
 
-                printf("8\n");
                 tempOrigInHash->prec = NULL;         //sposta in cache
                 tempOrigInHash->p=NULL;
                 tempOrigInHash->next = cacheHashOrig;
@@ -522,7 +507,6 @@ void delent(){
                tempOrig = tempOrig->next;
             }
 
-            printf("9\n");
             if(precOrig != NULL){
                 precOrig->next = cacheOrig;
                 cacheOrig = tempHead->first_orig;
@@ -543,15 +527,12 @@ void delent(){
             tempHeadInHash->p = NULL;
             tempHeadInHash = tempHeadInHash->next;
         }
-        printf("10\n");
         if(precHeadInHash!=NULL){
             precHeadInHash->next = cacheHashHead;
             cacheHashHead = p_user->head_list;
         }
 
 
-    }else {
-        printf("entità non monitorata\n");
     }
 
 }
@@ -581,71 +562,70 @@ void delrel() {
 
     if(p_dest!=NULL && p_orig!=NULL && p_rel!=NULL) { //esistono orig dest e rel
         tempHeadInHash = p_dest->head_list;
-        while(tempHeadInHash!=NULL && tempHeadInHash->p->rel!=p_rel ) { //cerco dest nella entity
+        while (tempHeadInHash != NULL && tempHeadInHash->p->rel != p_rel) { //cerco dest nella entity
             tempHeadInHash = tempHeadInHash->next;
         }
-        if(tempHeadInHash == NULL) {        //dest non esiste in quella typerel
-            printf("relazione non esistente\n");
-        }else {
+        if (tempHeadInHash == NULL) {        //dest non esiste in quella typerel
+            //printf("relazione non esistente\n");
+        } else {
             tempOrig = tempHeadInHash->p->first_orig;
-            while(tempOrig != NULL && tempOrig->name!=p_orig){
+            while (tempOrig != NULL && tempOrig->name != p_orig) {
                 tempOrig = tempOrig->next;
             }
-            if(tempOrig == NULL){ //dest esiste  ma non esiste orig in quella typerel
-                printf("relanzione non esistente\n");
-            }else {//MODIFICA STRUTTURA
+            if (tempOrig == NULL) { //dest esiste  ma non esiste orig in quella typerel
+                //printf("relanzione non esistente\n");
+            } else {//MODIFICA STRUTTURA
 
                 tempHead = tempHeadInHash->p;
 
                 //cerca orig_in_hash in p_orig
                 tempOrigInHash = p_orig->orig_list;
-                while(tempOrigInHash!=NULL && tempOrigInHash->p != tempOrig ) {
+                while (tempOrigInHash != NULL && tempOrigInHash->p != tempOrig) {
                     tempOrigInHash = tempOrigInHash->next;
                 }
 
                 //elimina da entity head_in_hash && orig_in_hash
-                if(tempOrigInHash->prec!=NULL){
+                if (tempOrigInHash->prec != NULL) {
                     tempOrigInHash->prec->next = tempOrigInHash->next;
-                }else {
+                } else {
                     p_orig->orig_list = tempOrigInHash->next; //cambia testa della lista
                 }
 
-                if(tempOrigInHash->next!=NULL){
+                if (tempOrigInHash->next != NULL) {
                     tempOrigInHash->next->prec = tempOrigInHash->prec;
                 }
 
                 tempOrigInHash->prec = NULL;         //sposta in cache
-                tempOrigInHash->p=NULL;
+                tempOrigInHash->p = NULL;
                 tempOrigInHash->next = cacheHashOrig;
                 cacheHashOrig = tempOrigInHash;
 
 
-
-                if(tempHeadInHash->prec!=NULL){
+                if (tempHeadInHash->prec != NULL) {
                     tempHeadInHash->prec->next = tempHeadInHash->next;
-                }else {
+                } else {
                     p_dest->head_list = tempHeadInHash->next; //cambia testa della lista
                 }
 
-                if(tempHeadInHash->next!=NULL){
+                if (tempHeadInHash->next != NULL) {
                     tempHeadInHash->next->prec = tempHeadInHash->prec;
                 }
 
                 tempHeadInHash->prec = NULL;         //sposta cache
-                tempHeadInHash->p=NULL;
+                tempHeadInHash->p = NULL;
                 tempHeadInHash->next = cacheHashHead;
                 cacheHashHead = tempHeadInHash;
 
 
 
                 //elimina origEnt nella struttura delle rel
-                if(tempOrig->prec!=NULL){
+                if (tempOrig->prec != NULL) {
                     tempOrig->prec->next = tempOrig->next;
-                }else {
+                } else {
                     tempOrig->dest->first_orig = tempOrig->next; //cambia testa della lista
                 }
 
-                if(tempOrig->next!=NULL){
+                if (tempOrig->next != NULL) {
                     tempOrig->next->prec = tempOrig->prec;
                 }
 
@@ -657,39 +637,41 @@ void delrel() {
 
                 //decrementa di una relazione dest
                 tempHead->n_rel--;
-                if(tempHead->n_rel>0){ //riordina dest
+                if (tempHead->n_rel > 0) { //riordina dest
 
                     index_head = tempHead;
-                    while (index_head->next != NULL && (index_head->next->n_rel>tempHead->n_rel || (index_head->next->n_rel==tempHead->n_rel && strcmp(tempHead->name->name,index_head->name->name)>0)) ) {
+                    while (index_head->next != NULL && (index_head->next->n_rel > tempHead->n_rel ||
+                                                        (index_head->next->n_rel == tempHead->n_rel &&
+                                                         strcmp(tempHead->name->name, index_head->name->name) > 0))) {
                         index_head = index_head->next;
                     }
 
-                    if(index_head != tempHead) { //va spostato
+                    if (index_head != tempHead) { //va spostato
 
                         //estrazione
-                        if(tempHead->prec!=NULL){
+                        if (tempHead->prec != NULL) {
                             tempHead->prec->next = tempHead->next;
-                        }else {
+                        } else {
                             tempHead->rel->head_list = tempHead->next; //cambia testa della lista
                         }
                         tempHead->next->prec = tempHead->prec;
 
                         //riposizionamento
-                        tempHead->prec=index_head;
-                        tempHead->next=index_head->next;
-                        if(index_head->next != NULL) index_head->next->prec = tempHead;
+                        tempHead->prec = index_head;
+                        tempHead->next = index_head->next;
+                        if (index_head->next != NULL) index_head->next->prec = tempHead;
                         index_head->next = tempHead;
 
                     }
 
-                }else {//elimina dalla lista il dest
-                    if(tempHead->prec!=NULL){
+                } else {//elimina dalla lista il dest
+                    if (tempHead->prec != NULL) {
                         tempHead->prec->next = tempHead->next;
-                    }else {
+                    } else {
                         tempHead->rel->head_list = tempHead->next; //cambia testa della lista
                     }
 
-                    if(tempHead->next!=NULL){
+                    if (tempHead->next != NULL) {
                         tempHead->next->prec = tempHead->prec;
                     }
 
@@ -700,11 +682,9 @@ void delrel() {
                     cacheHead = tempHead;
 
                 }
-                printf("DELREL modifica struttura\n");
+                //printf("DELREL modifica struttura\n");
             }
         }
-    }else { //non esiste typerel
-        printf("relazione non esistente\n");
     }
 
 }
@@ -713,15 +693,19 @@ void report(){
     typeRel *tempRel = NULL;
     headReport *tempHead = NULL;
     int flagfirst = 0;
+    int flagnone = 0;
     int flagspace;
     int n_rel = -1;
 
     for(int i=0 ; i<78; i++) {
-        flagspace = 0;
         tempRel = array_lex[i];
         while (tempRel!=NULL){
             if(tempRel->head_list!=NULL) {
-                if(flagspace!=0) printf(" ");
+                flagnone = 1;
+                if(flagspace!=0) {
+                    printf(" ");
+                }
+                flagspace = 1;
                 printf("\"%s\" ",tempRel->id_rel);
                 tempHead = tempRel->head_list;
                 n_rel = tempHead->n_rel;
@@ -736,11 +720,12 @@ void report(){
             tempRel =tempRel->next;
         }
     }
+    if(flagnone == 0) printf("none");
     printf("\n");
 }
 
 void end(){
-    printf("end\n");
+    //printf("end\n");
 }
 
 int main() {
@@ -796,5 +781,5 @@ int main() {
     } while(action[0]!='e');
 
 
-    printf("end of file\n");
+    //printf("end of file\n");
 }
