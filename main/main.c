@@ -24,8 +24,9 @@ typedef struct origRel {
 }origRel;
 
 typedef struct headReport{                                 // entity in hashmap
-    int n_rel;
     struct entity *name;
+    int n_rel;
+    struct typeRel *rel;
     origRel *first_orig;
     struct headReport *prec;
     struct headReport *next;
@@ -215,6 +216,7 @@ void addrel() {
                 item_head->n_rel = 0;                       //riempo e posiziono la headReport
                 item_head->next = NULL;
                 item_head->name = p_dest;
+                item_head->rel = p_rel;
 
                 if (temp_head == NULL) {
                     p_rel->head_list = item_head;
@@ -296,6 +298,7 @@ void addrel() {
             // LISTA REPORT MODIFICATA
 
             printf("modificata \n");
+
         }else {     //creo nuovo typeRel
             item_rel = malloc(sizeof(typeRel));         //mi creo elemento per typeRel
 
@@ -331,6 +334,7 @@ void addrel() {
             item_head->n_rel = 1;                       //riempo headReport
             item_head->next = NULL;
             item_head->prec = NULL;
+            item_head->rel = item_rel;
             item_head->name = p_dest;
             item_head->first_orig = item_orig;
 
@@ -372,7 +376,50 @@ void addrel() {
 
 void delent(){}
 
-void delrel() {}
+void delrel() {
+    char orig[1024];
+    char dest[1024];
+    char rel[1024];
+
+    entity *p_dest;
+    entity *p_orig;
+    head_in_hash *tempHeadInHash;
+    origRel *tempOrig;
+    typeRel *p_rel;
+    typeRel *prec_rel;
+
+    read(orig);
+    read(dest);
+    read(rel);
+
+    findRel(rel,&p_rel,&prec_rel);
+    findInHash(dest,&p_dest);
+    findInHash(orig,&p_orig);
+
+    if(p_dest!=NULL && p_orig!=NULL && p_rel!=NULL) { //esistono orig dest e rel
+        tempHeadInHash = p_dest->head_list;
+        while(tempHeadInHash!=NULL && tempHeadInHash->p->rel!=p_rel ) { //cerco dest nella entity
+            tempHeadInHash = tempHeadInHash->next;
+        }
+        if(tempHeadInHash == NULL) {        //dest non esiste in quella typerel
+            printf("relazione non esistente\n");
+        }else {
+            tempOrig = tempHeadInHash->p->first_orig;
+            while(tempOrig != NULL && tempOrig->name!=p_orig){
+                tempOrig = tempOrig->next;
+            }
+            if(tempOrig == NULL){ //dest esiste  ma non esiste orig in quella typerel
+                printf("relanzione non esistente\n");
+            }else {
+                //MODIFICA STRUTTURA
+                printf("DELREL modifica struttura\n");
+            }
+        }
+    }else { //non esiste typerel
+        printf("relazione non esistente\n");
+    }
+
+}
 
 void report(){}
 
