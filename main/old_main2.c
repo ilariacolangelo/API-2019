@@ -259,7 +259,7 @@ void addrel(){
         }
 
 
-    }//else printf("entità non monitorate\n");
+    }else printf("entità non monitorate\n");
 
 }
 
