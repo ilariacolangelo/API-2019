@@ -213,7 +213,6 @@ void addrel() {
                     return;
                 }
             }else {
-                //printf("entra qui\n");
                 if (cacheHead == NULL) {                     //mi creo elemento per headReport controllando la cacheHead
                     item_head = malloc(sizeof(headReport));
                 } else {
@@ -276,11 +275,14 @@ void addrel() {
             item_hash_orig->p = item_orig;                  //aggancio entity alla struttura delle rel
             item_hash_orig->next = p_orig->orig_list;
             item_hash_orig->prec = NULL;
-            if(p_orig->orig_list!=NULL) p_orig->orig_list->prec = item_hash_orig;
+            if(p_orig->orig_list!=NULL) {
+                p_orig->orig_list->prec = item_hash_orig;
+            }
+
             p_orig->orig_list = item_hash_orig;
 
             temp_head->n_rel++;
-            //printf("added n_rel %d %s\n",temp_head->n_rel,temp_head->name->name);
+
             //RIORDINAMENTO LISTA REPORT
             index_head = temp_head;
             while (index_head->prec != NULL && (temp_head->n_rel > index_head->prec->n_rel ||
@@ -368,12 +370,14 @@ void addrel() {
             item_hash_head->p = item_head;
             item_hash_head->next=p_dest->head_list;
             item_hash_head->prec = NULL;
+            if(p_dest->head_list!=NULL) p_dest->head_list->prec = item_hash_head;
             p_dest->head_list = item_hash_head;
             //printf("p_dest %s rel %s\n",p_dest->name, p_dest->head_list->p->rel->id_rel);
 
             item_hash_orig->p = item_orig;                  //
             item_hash_orig->next = p_orig->orig_list;
             item_hash_orig->prec = NULL;
+            if(p_orig->orig_list!=NULL) p_orig->orig_list->prec = item_hash_orig;
             p_orig->orig_list = item_hash_orig;
             //printf("p_orig %s stringe rel %s con %s \n",p_orig->name,p_orig->orig_list->p->dest->rel->id_rel, p_orig->orig_list->p->dest->name->name);
             //printf("rel aggiunta\n");
@@ -486,6 +490,7 @@ void delent(){
                if(p_head_in_hash->next!=NULL){
                    p_head_in_hash->next->prec = p_head_in_hash->prec;
                }
+
                //svuoto head_in_hash e metto in cache
                p_head_in_hash->prec = NULL;
                p_head_in_hash->p = NULL;
@@ -536,18 +541,25 @@ void delent(){
             }
 
             p_orig = p_head->first_orig;
+
             while(p_orig!=NULL) {
                 prec_orig = p_orig;
+
                 //vai nella entity->trova la orig_in_hash
                 p_ent_o = p_orig->name;
                 p_ent_o_in_hash = p_ent_o->orig_list;
+
                 while(p_ent_o_in_hash->p != p_orig){
                     p_ent_o_in_hash = p_ent_o_in_hash->next;
                 }
+
                 //estrai la orig_in_hash
+
                 if(p_ent_o_in_hash->prec!=NULL){
                    p_ent_o_in_hash->prec->next = p_ent_o_in_hash->next;
-                }else p_ent_o->orig_list = p_ent_o_in_hash->next;
+                }else {
+                    p_ent_o->orig_list = p_ent_o_in_hash->next;
+                }
                 if(p_ent_o_in_hash->next!= NULL){
                     p_ent_o_in_hash->next->prec = p_ent_o_in_hash->prec;
                 }
@@ -582,7 +594,6 @@ void delent(){
 
             p_head_in_hash = p_head_in_hash->next;
         }
-
         if(prec_head_in_hash != NULL){//almeno un elemento eliminato
             prec_head_in_hash->next = cacheHashHead;
             cacheHashHead = p_user->head_list;
@@ -655,7 +666,6 @@ void delrel() {
                 } else {
                     p_orig->orig_list = tempOrigInHash->next; //cambia testa della lista
                 }
-
                 if (tempOrigInHash->next != NULL) {
                     tempOrigInHash->next->prec = tempOrigInHash->prec;
                 }
@@ -666,13 +676,12 @@ void delrel() {
                 cacheHashOrig = tempOrigInHash;
 
 
-                if(tempHeadInHash->p->n_rel == 1) { //elimina riferimento da entità a headReport
+                if(tempHeadInHash->p->n_rel == 1) { //elimina head_in_hash
                     if (tempHeadInHash->prec != NULL) {
                         tempHeadInHash->prec->next = tempHeadInHash->next;
                     } else {
                         p_dest->head_list = tempHeadInHash->next; //cambia testa della lista
                     }
-
                     if (tempHeadInHash->next != NULL) {
                         tempHeadInHash->next->prec = tempHeadInHash->prec;
                     }
@@ -801,19 +810,27 @@ int main() {
     entity *pEnt,*precEnt;
     head_in_hash *hIH;
     orig_in_hash *oIH;
+    origRel *o;
     headReport *head;
     do{
         scanf("%s", action);
         count++;
         //printf("%d)\n",count);
-        /*if(count == 225) {
-            findInHash("Colony_Sarff",&pEnt,&precEnt);
+        /*if( count<=1934) {
+            findInHash("f",&pEnt,&precEnt);
             if(pEnt!= NULL) {
                 hIH = pEnt->head_list;
                 oIH = pEnt->orig_list;
                 printf("%s DEST OF:",pEnt->name);
                 while(hIH!=NULL){
-                    printf("%s -> ",hIH->p->rel->id_rel);
+                    printf("rel %s with:",hIH->p->rel->id_rel);
+                    o = hIH->p->first_orig;
+                    while(o!=NULL){
+                        printf("%s && ",o->name->name);
+                        o = o->next;
+                    }
+
+                    printf("X ----> ");
                     hIH = hIH->next;
                 }
                 printf("X Orig for:");
