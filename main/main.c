@@ -67,6 +67,7 @@ int hashfunc(char username[]){                      //polynomial rolling hash fu
         hashval+=(int)username[i]*(long int)exp2(i);
     }
     return (int)hashval%SIZEHASH;
+
 }
 
 void read(char string[]){                           // scanf without " "
@@ -330,10 +331,17 @@ void addrel() {
             item_rel->next = NULL;
 
             findRel(rel,&p_rel,&prec_rel);
-            if (prec_rel == NULL) { //aggiungi in testa
+            if (prec_rel == NULL) {
                 pos=(int)rel[0]- 45;
-                if(array_lex[pos] != NULL) item_rel->next = array_lex[pos];
-                array_lex[pos] = item_rel;
+                if(array_lex[pos]==NULL){
+                    array_lex[pos] = item_rel;
+                }else if(strcmp(rel, array_lex[pos]->id_rel)<0) { //aggiungi in testa
+                    item_rel->next = array_lex[pos];
+                    array_lex[pos] = item_rel;
+                }else {
+                    array_lex[pos]->next = item_rel;
+                }
+
 
             }else {//aggiungi in mezzo o coda
                 item_rel->next = prec_rel->next;
@@ -408,7 +416,7 @@ void delent(){
             prec_user->next = p_user->next;
         }
         else {
-            hash[hashfunc(username)] = NULL;
+            hash[hashfunc(username)] = hash[hashfunc(username)]->next;
         }
 
         //ispeziono tutte le volte che user è stato orig
@@ -807,6 +815,7 @@ int main() {
     char action[10];
     int count = 0;
     typeRel *p;
+    entity *t;
     entity *pEnt,*precEnt;
     head_in_hash *hIH;
     orig_in_hash *oIH;
@@ -816,8 +825,8 @@ int main() {
         scanf("%s", action);
         count++;
         //printf("%d)\n",count);
-        /*if( count<=1934) {
-            findInHash("f",&pEnt,&precEnt);
+        /*if( count <=513) {
+            findInHash("The_Borg_Queen",&pEnt,&precEnt);
             if(pEnt!= NULL) {
                 hIH = pEnt->head_list;
                 oIH = pEnt->orig_list;
@@ -840,7 +849,15 @@ int main() {
                     oIH = oIH->next;
                 }
                 printf("X\n");
+            }else printf("no way\n");
+
+            t = hash[10];
+            printf("HASH: ");
+            while(t!=NULL){
+                printf("%s -> ",t->name);
+                t = t->next;
             }
+            printf("END\n");
         }*/
         if(action[0]=='a') {
 
@@ -860,11 +877,11 @@ int main() {
             end();
         }
 
-        /*if(count>=142 && count<=145) {
+        /*if(count >= 504 && count<=520) {
             for (int i = 0; i < 78; i++) {
                 p = array_lex[i];
                 while (p != NULL) {
-                    printf("%s\n", p->id_rel);
+                    printf("%d-> %s\n", i, p->id_rel);
                     head = p->head_list;
                     while(head!=NULL){
                         printf("%s %d\n",head->name->name, head->n_rel);
