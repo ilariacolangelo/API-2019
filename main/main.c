@@ -808,7 +808,87 @@ void report(){
 }
 
 void end(){
-    //printf("end\n");
+    entity *p_entity = NULL;
+    typeRel *p_typerel = NULL;
+    headReport *p_head = NULL;
+    origRel *p_orig = NULL;
+    orig_in_hash *p_o_hash = NULL;
+    head_in_hash *p_h_hash = NULL;
+
+    //svuota cache
+    while(cacheEnt!=NULL){
+        p_entity = cacheEnt;
+        cacheEnt = cacheEnt->next;
+        free(p_entity);
+    }
+
+    while(cacheOrig!=NULL){
+        p_orig = cacheOrig;
+        cacheOrig = cacheOrig->next;
+        free(p_orig);
+    }
+
+    while(cacheHead!=NULL){
+        p_head = cacheHead;
+        cacheHead = cacheHead->next;
+        free(p_head);
+    }
+
+    while(cacheHashOrig!=NULL){
+        p_o_hash = cacheHashOrig;
+        cacheHashOrig = cacheHashOrig->next;
+        free(p_o_hash);
+    }
+
+    while(cacheHashHead!=NULL){
+        p_h_hash = cacheHashHead;
+        cacheHashHead = cacheHashHead->next;
+        free(p_h_hash);
+    }
+
+    //dealloc typeRel structure
+    for (int i = 0; i < 78; i++) {
+
+        while (array_lex[i] != NULL) {
+            p_typerel = array_lex[i];
+
+            while(p_typerel->head_list!=NULL){
+                p_head = p_typerel->head_list;
+
+                while(p_head->first_orig!=NULL) {
+                    p_orig = p_head->first_orig;
+                    p_head->first_orig = p_orig->next;
+                    free(p_orig);
+                }
+                p_typerel->head_list = p_head->next;
+                free(p_head);
+            }
+            array_lex[i] = p_typerel->next;
+            free(p_typerel);
+        }
+    }
+
+    //dealloc entity structure
+    for(int j = 0; j<SIZEHASH; j++) {
+        while(hash[j]!=NULL) {
+            p_entity=hash[j];
+
+            while(p_entity->head_list!=NULL){
+                p_h_hash = p_entity->head_list;
+                p_entity->head_list = p_h_hash->next;
+                free(p_h_hash);
+            }
+
+            while(p_entity->orig_list!=NULL){
+                p_o_hash = p_entity->orig_list;
+                p_entity->orig_list = p_o_hash->next;
+                free(p_o_hash);
+            }
+
+            hash[j]=p_entity->next;
+            free(p_entity);
+        }
+    }
 }
 
 int main() {
